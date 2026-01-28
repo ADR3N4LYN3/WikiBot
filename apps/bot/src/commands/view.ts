@@ -1,5 +1,5 @@
 import { DISCORD_COLORS } from '@wikibot/shared';
-import { SlashCommandBuilder, CommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 
 import { apiClient } from '../services/apiClient';
 import { Command } from '../types';
@@ -15,10 +15,10 @@ const command: Command = {
         .setRequired(true)
     ),
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply();
 
-    const slug = interaction.options.get('slug', true).value as string;
+    const slug = interaction.options.getString('slug', true);
     const serverId = interaction.guildId;
 
     if (!serverId) {

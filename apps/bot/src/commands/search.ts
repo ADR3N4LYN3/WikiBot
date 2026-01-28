@@ -1,7 +1,7 @@
 import { DISCORD_COLORS } from '@wikibot/shared';
 import {
   SlashCommandBuilder,
-  CommandInteraction,
+  ChatInputCommandInteraction,
   EmbedBuilder,
 } from 'discord.js';
 
@@ -21,10 +21,10 @@ const command: Command = {
         .setMaxLength(200)
     ),
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     await interaction.deferReply();
 
-    const query = interaction.options.get('query', true).value as string;
+    const query = interaction.options.getString('query', true);
     const serverId = interaction.guildId;
 
     if (!serverId) {
