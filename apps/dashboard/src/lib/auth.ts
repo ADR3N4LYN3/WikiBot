@@ -16,7 +16,7 @@ const nextAuth = NextAuth({
   callbacks: {
     async jwt({ token, account, profile }) {
       if (account && profile) {
-        token.discordId = profile.id;
+        token.discordId = profile.id ?? undefined;
         token.accessToken = account.access_token;
       }
       return token;
