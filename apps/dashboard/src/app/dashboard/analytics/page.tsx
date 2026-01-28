@@ -12,16 +12,11 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
 } from 'recharts';
 import { Search, Eye, BookOpen, TrendingUp } from 'lucide-react';
 
 import { analyticsApi } from '@/lib/api';
 import { formatNumber } from '@/lib/utils';
-
-const COLORS = ['#5865F2', '#57F287', '#FEE75C', '#EB459E', '#ED4245'];
 
 export default function AnalyticsPage() {
   const [period, setPeriod] = useState(30);

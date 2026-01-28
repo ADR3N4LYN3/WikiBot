@@ -19,6 +19,7 @@ RUN pnpm --filter @wikibot/database prisma generate
 
 # Build the dashboard
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV DOCKER_BUILD=true
 RUN pnpm --filter @wikibot/dashboard build
 
 # Production stage

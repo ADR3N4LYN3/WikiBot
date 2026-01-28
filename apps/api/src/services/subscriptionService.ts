@@ -185,7 +185,7 @@ export async function cancelSubscription(
 
   if (immediate) {
     await stripe.subscriptions.cancel(settings.stripeSubscriptionId);
-    await updateServerTier(serverId, 'free');
+    await updateServerTier(serverId, SubscriptionTier.FREE);
   } else {
     await stripe.subscriptions.update(settings.stripeSubscriptionId, {
       cancel_at_period_end: true,
@@ -350,7 +350,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<void> {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
       const serverId = session.metadata?.serverId;
-      const tier = session.metadata?.tier as 'premium' | 'pro';
+      const tier = session.metadata?.tier as SubscriptionTier;
 
       if (serverId && tier) {
         const subscriptionId =
@@ -378,7 +378,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<void> {
           subscription.status === 'canceled' ||
           subscription.status === 'unpaid'
         ) {
-          await updateServerTier(serverId, 'free');
+          await updateServerTier(serverId, SubscriptionTier.FREE);
         }
       }
       break;
@@ -389,7 +389,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<void> {
       const serverId = subscription.metadata?.serverId;
 
       if (serverId) {
-        await updateServerTier(serverId, 'free');
+        await updateServerTier(serverId, SubscriptionTier.FREE);
         console.log(`⚠️ Subscription canceled for server ${serverId}`);
       }
       break;

@@ -2,7 +2,7 @@ import { prisma } from '@wikibot/database';
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 
-import { extractServerId, AuthenticatedRequest } from '../middleware/auth';
+import { extractServerId } from '../middleware/auth';
 import {
   createCheckoutSession,
   createPortalSession,
@@ -30,7 +30,7 @@ const checkoutSchema = z.object({
  */
 subscriptionsRouter.post(
   '/checkout',
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {
@@ -79,7 +79,7 @@ subscriptionsRouter.post(
  */
 subscriptionsRouter.post(
   '/portal',
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {
@@ -108,7 +108,7 @@ subscriptionsRouter.post(
  */
 subscriptionsRouter.get(
   '/status',
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {
@@ -129,7 +129,7 @@ subscriptionsRouter.get(
  */
 subscriptionsRouter.get(
   '/usage',
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {
@@ -150,7 +150,7 @@ subscriptionsRouter.get(
  */
 subscriptionsRouter.post(
   '/cancel',
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {

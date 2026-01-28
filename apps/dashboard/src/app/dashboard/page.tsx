@@ -1,7 +1,7 @@
 'use client';
 
 import useSWR from 'swr';
-import { BookOpen, Search, Eye, FolderOpen, TrendingUp, TrendingDown } from 'lucide-react';
+import { BookOpen, Search, Eye, FolderOpen, TrendingUp } from 'lucide-react';
 import {
   LineChart,
   Line,

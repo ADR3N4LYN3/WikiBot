@@ -76,7 +76,7 @@ async function semanticSearchArticles(
 
     // Map results with scores
     const results = semanticResults.map((sr) => {
-      const article = articles.find((a) => a.id === sr.id);
+      const article = articles.find((a: typeof articles[number]) => a.id === sr.id);
       if (!article) return null;
 
       return {
@@ -162,7 +162,7 @@ async function fullTextSearch(
   });
 
   // Calculate relevance based on match quality
-  const results = articles.map((article) => {
+  const results = articles.map((article: typeof articles[number]) => {
     let relevance = 0;
     const titleLower = article.title.toLowerCase();
     const contentLower = article.content.toLowerCase();
@@ -198,7 +198,7 @@ async function fullTextSearch(
   });
 
   // Sort by relevance
-  results.sort((a, b) => b.relevance - a.relevance);
+  results.sort((a: { relevance: number }, b: { relevance: number }) => b.relevance - a.relevance);
 
   return {
     results,

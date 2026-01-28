@@ -53,7 +53,7 @@ export async function generateRAGAnswer(
     // Build context from articles
     const context = articles
       .map(
-        (article) =>
+        (article: { id: string; title: string; slug: string; content: string }) =>
           `## ${article.title}\n\n${article.content.slice(0, 2000)}`
       )
       .join('\n\n---\n\n');
@@ -94,7 +94,7 @@ Rules:
 
     return {
       answer,
-      sources: articles.map((a) => ({
+      sources: articles.map((a: { id: string; title: string; slug: string; content: string }) => ({
         id: a.id,
         title: a.title,
         slug: a.slug,

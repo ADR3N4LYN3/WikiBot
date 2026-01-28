@@ -1,10 +1,10 @@
 import { prisma } from '@wikibot/database';
 import { TIER_LIMITS, SubscriptionTier } from '@wikibot/shared';
 import archiver from 'archiver';
-import { Router, Response, NextFunction } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 
-import { extractServerId, AuthenticatedRequest } from '../middleware/auth';
+import { extractServerId } from '../middleware/auth';
 import {
   exportServerData,
   importServerData,
@@ -23,7 +23,7 @@ exportRouter.use(extractServerId);
  */
 exportRouter.get(
   '/json',
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {
@@ -51,7 +51,7 @@ exportRouter.get(
  */
 exportRouter.get(
   '/markdown',
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {
@@ -132,7 +132,7 @@ const importSchema = z.object({
  */
 exportRouter.post(
   '/import',
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       const userId = req.headers['x-user-id'] as string;
@@ -192,7 +192,7 @@ exportRouter.post(
  */
 exportRouter.post(
   '/validate',
-  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+  async (req: Request, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {
@@ -236,7 +236,7 @@ exportRouter.post(
         where: { serverId },
         select: { slug: true },
       });
-      const slugSet = new Set(existingSlugs.map((a) => a.slug));
+      const slugSet = new Set(existingSlugs.map((a: { slug: string }) => a.slug));
       const duplicates = data.articles.filter((a) => slugSet.has(a.slug));
 
       if (duplicates.length > 0) {

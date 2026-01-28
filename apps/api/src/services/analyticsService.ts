@@ -50,7 +50,7 @@ export async function getTopArticles(serverId: string, limit: number): Promise<T
     },
   });
 
-  return articles.map(article => ({
+  return articles.map((article: typeof articles[number]) => ({
     id: article.id,
     title: article.title,
     slug: article.slug,
@@ -72,7 +72,7 @@ export async function getTopSearches(serverId: string, limit: number): Promise<T
     take: limit,
   });
 
-  return searches.map(search => ({
+  return searches.map((search: typeof searches[number]) => ({
     query: search.query,
     count: search._count.query,
     avgResultCount: Math.round(search._avg.resultCount || 0),
@@ -105,7 +105,7 @@ export async function getActivity(serverId: string, days: number): Promise<Activ
   // Group by date
   const activityMap = new Map<string, ActivityData>();
 
-  searches.forEach(search => {
+  searches.forEach((search: { timestamp: Date }) => {
     const date = search.timestamp.toISOString().split('T')[0];
     const existing = activityMap.get(date) || {
       date,
@@ -117,7 +117,7 @@ export async function getActivity(serverId: string, days: number): Promise<Activ
     activityMap.set(date, existing);
   });
 
-  articles.forEach(article => {
+  articles.forEach((article: { createdAt: Date }) => {
     const date = article.createdAt.toISOString().split('T')[0];
     const existing = activityMap.get(date) || {
       date,

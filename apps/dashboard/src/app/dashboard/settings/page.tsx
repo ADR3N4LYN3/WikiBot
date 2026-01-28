@@ -27,7 +27,7 @@ interface Settings {
 }
 
 export default function SettingsPage() {
-  const { data: session } = useSession();
+  useSession(); // Ensure user is authenticated
   const [brandColor, setBrandColor] = useState('#5865F2');
   const [publicWebview, setPublicWebview] = useState(true);
   const [saving, setSaving] = useState(false);

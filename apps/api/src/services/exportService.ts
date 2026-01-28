@@ -78,14 +78,14 @@ export async function exportServerData(serverId: string): Promise<ExportData> {
       id: server.id,
       name: server.name,
     },
-    categories: categories.map((cat) => ({
+    categories: categories.map((cat: typeof categories[number]) => ({
       name: cat.name,
       slug: cat.slug,
       description: cat.description || undefined,
       emoji: cat.emoji || undefined,
       position: cat.position,
     })),
-    articles: articles.map((article) => ({
+    articles: articles.map((article: typeof articles[number]) => ({
       title: article.title,
       slug: article.slug,
       content: article.content,
