@@ -152,9 +152,10 @@ pnpm dev
 
 Dans ton serveur Discord :
 ```
-/wiki create
-/wiki search query:test
-/wiki view slug:mon-article
+/wiki-create
+/wiki-search query:test
+/wiki-view slug:mon-article
+/wiki-help
 ```
 
 ---
@@ -288,6 +289,12 @@ https://wikibot-app.xyz/api/auth/callback/discord
 - Vérifie que le bot est invité sur ton serveur
 - Regarde les logs : `pnpm --filter @wikibot/bot dev`
 
+### "Servers not showing in dashboard"
+- Le bot doit être **démarré** pour synchroniser les serveurs
+- Au démarrage, le bot enregistre automatiquement tous les serveurs où il est présent
+- L'API doit être accessible (`http://localhost:4000`)
+- Tu dois avoir la permission **MANAGE_GUILD** sur les serveurs pour les voir
+
 ---
 
 ## Structure des Services
@@ -302,4 +309,71 @@ WikiBot/
 │   ├── database/   → Prisma schema
 │   └── shared/     → Types partagés
 └── docker-compose.yml
+```
+
+---
+
+## API Endpoints
+
+### Public
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/health` | Health check |
+| GET | `/api/public/stats` | Statistiques publiques (landing page) |
+
+### Servers
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/servers` | Créer/mettre à jour un serveur |
+| GET | `/api/v1/servers/:id` | Récupérer un serveur |
+| DELETE | `/api/v1/servers/:id` | Supprimer un serveur |
+
+### Articles
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/articles` | Liste des articles |
+| POST | `/api/v1/articles` | Créer un article |
+| GET | `/api/v1/articles/:slug` | Récupérer un article |
+| PUT | `/api/v1/articles/:slug` | Mettre à jour un article |
+| DELETE | `/api/v1/articles/:slug` | Supprimer un article |
+
+### Categories
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/categories` | Liste des catégories |
+| POST | `/api/v1/categories` | Créer une catégorie |
+| PUT | `/api/v1/categories/:id` | Mettre à jour une catégorie |
+| DELETE | `/api/v1/categories/:id` | Supprimer une catégorie |
+
+### Search
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/search` | Recherche d'articles |
+
+### Analytics
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/v1/analytics` | Statistiques du serveur |
+
+---
+
+## Flow de Synchronisation des Serveurs
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   Bot       │────▶│   API       │────▶│  Database   │
+│  (startup)  │     │  /servers   │     │  (servers)  │
+└─────────────┘     └─────────────┘     └─────────────┘
+       │
+       └── Pour chaque serveur où le bot est présent
+           → POST /api/v1/servers { id, name }
+
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Dashboard  │────▶│  Discord    │────▶│  Dashboard  │
+│  (login)    │     │  API        │     │  /api/srv   │
+└─────────────┘     └─────────────┘     └─────────────┘
+       │                   │                   │
+       │                   │                   └── Cross-ref avec DB
+       │                   └── Guilds de l'user    (bot installé?)
+       └── Access token
 ```
