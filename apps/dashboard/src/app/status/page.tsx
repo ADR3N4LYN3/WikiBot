@@ -43,14 +43,14 @@ const services = [
 const incidents = [
   {
     id: 1,
-    title: 'Scheduled Maintenance Complete',
+    title: 'Scheduled maintenance complete',
     status: 'resolved',
     date: '2024-01-14',
     description: 'Database optimization completed successfully. All services are back to normal.',
   },
   {
     id: 2,
-    title: 'Minor API Latency',
+    title: 'Minor API latency',
     status: 'resolved',
     date: '2024-01-10',
     description: 'Some users experienced increased API response times. Issue has been resolved.',
@@ -116,7 +116,7 @@ export default function StatusPage() {
               glow={allOperational}
               className="text-base"
             >
-              {allOperational ? 'All Systems Operational' : 'Some Systems Affected'}
+              {allOperational ? 'All systems operational' : 'Some systems affected'}
             </Badge>
           </div>
         </section>
@@ -155,12 +155,12 @@ export default function StatusPage() {
         {/* Uptime */}
         <section className="py-12 sm:py-16 bg-muted/30">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold mb-6">Uptime (Last 90 Days)</h2>
+            <h2 className="text-2xl font-bold mb-6">Uptime (last 90 days)</h2>
 
             <GlassCard className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-4xl font-bold text-green-500">99.98%</span>
-                <span className="text-sm text-muted-foreground">Total Uptime</span>
+                <span className="text-sm text-muted-foreground">Total uptime</span>
               </div>
               <div className="flex gap-1">
                 {Array.from({ length: 90 }).map((_, i) => (
@@ -185,7 +185,7 @@ export default function StatusPage() {
         {/* Recent Incidents */}
         <section className="py-12 sm:py-16">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl font-bold mb-6">Recent Incidents</h2>
+            <h2 className="text-2xl font-bold mb-6">Recent incidents</h2>
 
             <div className="space-y-4">
               {incidents.map((incident) => (
@@ -212,7 +212,7 @@ export default function StatusPage() {
         {/* Subscribe */}
         <section className="py-12 sm:py-16 bg-muted/30">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-xl font-semibold mb-2">Stay Updated</h2>
+            <h2 className="text-xl font-semibold mb-2">Stay updated</h2>
             <p className="text-muted-foreground mb-6">
               Get notified about incidents and maintenance.
             </p>

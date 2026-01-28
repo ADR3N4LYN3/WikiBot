@@ -150,7 +150,7 @@ export default function ContactPage() {
                 </div>
 
                 <GradientButton type="submit" size="lg" className="w-full sm:w-auto">
-                  Send Message
+                  Send message
                 </GradientButton>
               </form>
             </GlassCard>
@@ -161,7 +161,7 @@ export default function ContactPage() {
         <section className="py-12 sm:py-16 bg-muted/30">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <Clock className="w-12 h-12 mx-auto text-primary mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Response Time</h2>
+            <h2 className="text-xl font-semibold mb-2">Response time</h2>
             <p className="text-muted-foreground">
               We typically respond within 24-48 hours during business days.
             </p>

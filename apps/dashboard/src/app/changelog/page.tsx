@@ -31,7 +31,7 @@ const releases: Release[] = [
   {
     version: '1.0.0',
     date: '2025-01-28',
-    title: 'Initial Release',
+    title: 'Initial release',
     changes: [
       { type: 'feature', description: 'Discord bot with slash commands for wiki management' },
       { type: 'feature', description: 'Web dashboard for article and category management' },
@@ -152,7 +152,7 @@ export default function ChangelogPage() {
         <section className="py-12 sm:py-16 bg-muted/30">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <Zap className="w-12 h-12 mx-auto text-primary mb-4" />
-            <h2 className="text-xl font-semibold mb-2">Never Miss an Update</h2>
+            <h2 className="text-xl font-semibold mb-2">Never miss an update</h2>
             <p className="text-muted-foreground mb-6">
               Join our Discord to get notified about new releases.
             </p>
