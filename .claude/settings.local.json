@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(if [ -f \"package.json\" ])",
+      "Bash(then echo \"✅ Package found\")",
+      "Bash(else echo \"❌ No package.json\")",
+      "Bash(fi)",
+      "Bash(git add:*)"
+    ]
+  }
+}

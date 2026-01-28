@@ -1,0 +1,148 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Server represents a Discord guild/server
+model Server {
+  id          String   @id // Discord guild ID
+  name        String
+  premium     Boolean  @default(false)
+  premiumTier String   @default("free") // free, premium, pro
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  articles   Article[]
+  categories Category[]
+  settings   ServerSettings?
+
+  @@map("servers")
+}
+
+// Server-specific settings and configuration
+model ServerSettings {
+  id       String @id @default(cuid())
+  serverId String @unique
+
+  // Customization
+  brandColor String  @default("#5865F2")
+  logoUrl    String?
+
+  // Limits (based on tier)
+  maxArticles         Int @default(50)
+  maxSearchesPerMonth Int @default(1000)
+
+  // Features toggles
+  aiSearchEnabled Boolean @default(false)
+  publicWebview   Boolean @default(true)
+
+  server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  @@map("server_settings")
+}
+
+// Discord user
+model User {
+  id            String   @id // Discord user ID
+  username      String
+  discriminator String
+  avatar        String?
+  createdAt     DateTime @default(now())
+
+  articles Article[]     @relation("ArticleAuthor")
+  edits    ArticleEdit[]
+
+  @@map("users")
+}
+
+// Article category for organization
+model Category {
+  id          String   @id @default(cuid())
+  serverId    String
+  name        String
+  slug        String
+  description String?
+  emoji       String?
+  position    Int      @default(0)
+  createdAt   DateTime @default(now())
+
+  server   Server    @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  articles Article[]
+
+  @@unique([serverId, slug])
+  @@index([serverId])
+  @@map("categories")
+}
+
+// Wiki article
+model Article {
+  id         String   @id @default(cuid())
+  serverId   String
+  categoryId String?
+  authorId   String
+  title      String
+  slug       String
+  content    String   @db.Text
+  embedding  String?  @db.Text // JSON array of embeddings for AI search
+
+  // Stats
+  views      Int @default(0)
+  helpful    Int @default(0)
+  notHelpful Int @default(0)
+
+  // Meta
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  server   Server        @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  category Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  author   User          @relation("ArticleAuthor", fields: [authorId], references: [id])
+  edits    ArticleEdit[]
+  searches SearchLog[]
+
+  @@unique([serverId, slug])
+  @@index([serverId, categoryId])
+  @@index([serverId, published])
+  @@map("articles")
+}
+
+// Article version history
+model ArticleEdit {
+  id        String   @id @default(cuid())
+  articleId String
+  editorId  String
+  content   String   @db.Text
+  changelog String?
+  createdAt DateTime @default(now())
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  editor  User    @relation(fields: [editorId], references: [id])
+
+  @@index([articleId])
+  @@map("article_edits")
+}
+
+// Search analytics
+model SearchLog {
+  id          String   @id @default(cuid())
+  serverId    String
+  userId      String
+  query       String
+  resultCount Int
+  clickedId   String?
+  timestamp   DateTime @default(now())
+
+  clicked Article? @relation(fields: [clickedId], references: [id], onDelete: SetNull)
+
+  @@index([serverId, timestamp])
+  @@index([query])
+  @@map("search_logs")
+}
