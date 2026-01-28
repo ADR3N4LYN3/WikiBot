@@ -21,7 +21,7 @@ publicRouter.get('/stats', async (_req, res) => {
       }),
       prisma.searchLog.count({
         where: {
-          createdAt: { gte: startOfMonth },
+          timestamp: { gte: startOfMonth },
         },
       }),
     ]);

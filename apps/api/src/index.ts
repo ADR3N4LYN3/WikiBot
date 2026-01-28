@@ -12,6 +12,7 @@ import { exportRouter } from './routes/export';
 import { healthRouter } from './routes/health';
 import { publicRouter } from './routes/public';
 import { searchRouter } from './routes/search';
+import { serversRouter } from './routes/servers';
 import { settingsRouter } from './routes/settings';
 import { subscriptionsRouter } from './routes/subscriptions';
 import { webhooksRouter } from './routes/webhooks';
@@ -45,6 +46,7 @@ app.use('/api/v1/categories', categoriesRouter);
 app.use('/api/v1/analytics', analyticsRouter);
 app.use('/api/v1/subscriptions', subscriptionsRouter);
 app.use('/api/v1/export', exportRouter);
+app.use('/api/v1/servers', serversRouter);
 app.use('/api/v1/settings', settingsRouter);
 
 // Error handling middleware (must be last)
