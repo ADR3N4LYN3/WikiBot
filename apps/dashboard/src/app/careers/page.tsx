@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { Briefcase, MapPin, Clock, ArrowRight, Heart, Zap, Users } from 'lucide-react';
+import { Briefcase, Heart, Zap, Users } from 'lucide-react';
 
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GradientText } from '@/components/ui/GradientText';
@@ -28,30 +28,6 @@ const benefits = [
     icon: Users,
     title: 'Great team',
     description: 'Work with passionate people who love what they do.',
-  },
-];
-
-const openPositions = [
-  {
-    id: 1,
-    title: 'Senior full-stack engineer',
-    department: 'Engineering',
-    location: 'Remote',
-    type: 'Full-time',
-  },
-  {
-    id: 2,
-    title: 'Product designer',
-    department: 'Design',
-    location: 'Remote',
-    type: 'Full-time',
-  },
-  {
-    id: 3,
-    title: 'Community manager',
-    department: 'Community',
-    location: 'Remote',
-    type: 'Full-time',
   },
 ];
 
@@ -109,46 +85,13 @@ export default function CareersPage() {
               Open <GradientText>Positions</GradientText>
             </h2>
 
-            <div className="space-y-4">
-              {openPositions.map((position) => (
-                <a key={position.id} href={`mailto:careers@wikibot-app.xyz?subject=Application: ${position.title}`}>
-                  <GlassCard className="p-6 group cursor-pointer hover:border-primary/50 transition-colors">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div>
-                        <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">
-                          {position.title}
-                        </h3>
-                        <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-muted-foreground">
-                          <span className="flex items-center gap-1">
-                            <Briefcase className="w-4 h-4" />
-                            {position.department}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <MapPin className="w-4 h-4" />
-                            {position.location}
-                          </span>
-                          <span className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            {position.type}
-                          </span>
-                        </div>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                    </div>
-                  </GlassCard>
-                </a>
-              ))}
-            </div>
-
-            {openPositions.length === 0 && (
-              <GlassCard className="p-12 text-center">
-                <Briefcase className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
-                <h3 className="text-lg font-semibold mb-2">No open positions</h3>
-                <p className="text-muted-foreground">
-                  We don&apos;t have any open positions right now, but check back soon!
-                </p>
-              </GlassCard>
-            )}
+            <GlassCard className="p-12 text-center">
+              <Briefcase className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No open positions</h3>
+              <p className="text-muted-foreground">
+                We don&apos;t have any open positions right now, but check back soon!
+              </p>
+            </GlassCard>
           </div>
         </section>
 
