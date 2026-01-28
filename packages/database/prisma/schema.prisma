@@ -43,8 +43,13 @@ model ServerSettings {
   aiSearchEnabled Boolean @default(false)
   publicWebview   Boolean @default(true)
 
+  // Stripe integration
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+
   server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
 
+  @@index([stripeCustomerId])
   @@map("server_settings")
 }
 
