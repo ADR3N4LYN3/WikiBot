@@ -159,9 +159,73 @@ Dans ton serveur Discord :
 
 ---
 
-## Déploiement Production
+## Déploiement Production (Docker + VPS)
 
-### Dashboard → Vercel
+### Option A : Docker sur VPS (Recommandé)
+
+**Prérequis** : Un VPS avec Docker installé (Hetzner, OVH, DigitalOcean...)
+
+#### 1. Configurer Cloudflare DNS
+
+Dans Cloudflare, ajoute ces records DNS pointant vers l'IP de ton VPS :
+
+| Type | Nom | Contenu | Proxy |
+|------|-----|---------|-------|
+| A | @ | `IP_DE_TON_VPS` | DNS only (gris) |
+| A | api | `IP_DE_TON_VPS` | DNS only (gris) |
+| A | www | `IP_DE_TON_VPS` | DNS only (gris) |
+
+**Important** : Laisse le proxy Cloudflare **désactivé** (icône grise) pour que Caddy gère le SSL.
+
+#### 2. Déployer sur le VPS
+
+```bash
+# Connecte-toi au VPS
+ssh user@ton-vps
+
+# Clone le repo
+git clone https://github.com/tonusername/WikiBot.git
+cd WikiBot
+
+# Crée le fichier .env avec tes variables
+nano .env
+
+# Lance tout
+docker compose up -d --build
+
+# Vérifie les logs
+docker compose logs -f
+```
+
+#### 3. Variables .env pour production
+
+```env
+# DATABASE (Supabase)
+DATABASE_URL="postgresql://postgres:xxx@db.xxx.supabase.co:5432/postgres"
+
+# DISCORD
+DISCORD_CLIENT_ID="..."
+DISCORD_CLIENT_SECRET="..."
+DISCORD_BOT_TOKEN="..."
+
+# NEXTAUTH (URLs de prod)
+NEXTAUTH_URL="https://wikibot-app.xyz"
+NEXTAUTH_SECRET="..." # openssl rand -base64 32
+
+# API
+NEXT_PUBLIC_API_URL="https://api.wikibot-app.xyz"
+```
+
+#### 4. Discord OAuth Redirect
+
+Dans Discord Developer Portal, ajoute le redirect URI de prod :
+```
+https://wikibot-app.xyz/api/auth/callback/discord
+```
+
+### Option B : Vercel + Railway (Serverless)
+
+#### Dashboard → Vercel
 
 1. Push ton code sur GitHub
 2. Va sur https://vercel.com
@@ -169,7 +233,7 @@ Dans ton serveur Discord :
 4. Configure les variables d'environnement
 5. Deploy !
 
-### API + Bot → Railway
+#### API + Bot → Railway
 
 1. Va sur https://railway.app
 2. Crée un nouveau projet
@@ -192,7 +256,9 @@ Dans ton serveur Discord :
 
 ### "Discord login failed"
 - Vérifie DISCORD_CLIENT_ID et DISCORD_CLIENT_SECRET
-- Vérifie que le redirect URI est exactement `http://localhost:3000/api/auth/callback/discord`
+- Vérifie que le redirect URI correspond à ton environnement :
+  - Dev : `http://localhost:3000/api/auth/callback/discord`
+  - Prod : `https://wikibot-app.xyz/api/auth/callback/discord`
 
 ### "Bot not responding"
 - Vérifie DISCORD_BOT_TOKEN

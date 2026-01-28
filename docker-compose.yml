@@ -1,17 +1,54 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
+  # Caddy Reverse Proxy (HTTPS automatique)
+  caddy:
+    image: caddy:2-alpine
+    container_name: wikibot-caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - dashboard
+      - api
+    networks:
+      - wikibot-network
+
+  # Next.js Dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: apps/dashboard/Dockerfile
+    container_name: wikibot-dashboard
+    restart: unless-stopped
+    expose:
+      - "3000"
+    environment:
+      - NEXTAUTH_URL=https://wikibot-app.xyz
+      - NEXT_PUBLIC_API_URL=https://api.wikibot-app.xyz
+    env_file:
+      - .env
+    depends_on:
+      - api
+    networks:
+      - wikibot-network
+
+  # PostgreSQL Database (local dev only - use Supabase in prod)
   postgres:
     image: postgres:15-alpine
     container_name: wikibot-db
     restart: unless-stopped
+    profiles:
+      - local
     environment:
       POSTGRES_USER: wikibot
       POSTGRES_PASSWORD: wikibot_password
       POSTGRES_DB: wikibot
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -19,14 +56,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - wikibot-network
 
   # Redis (for caching and rate limiting)
   redis:
     image: redis:7-alpine
     container_name: wikibot-redis
     restart: unless-stopped
-    ports:
-      - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -34,6 +71,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - wikibot-network
 
   # API Server
   api:
@@ -42,20 +81,19 @@ services:
       dockerfile: apps/api/Dockerfile
     container_name: wikibot-api
     restart: unless-stopped
-    ports:
-      - "4000:4000"
+    expose:
+      - "4000"
     environment:
-      - DATABASE_URL=postgresql://wikibot:wikibot_password@postgres:5432/wikibot
       - REDIS_URL=redis://redis:6379
       - API_PORT=4000
-      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_URL=https://wikibot-app.xyz
     env_file:
       - .env
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_healthy
+    networks:
+      - wikibot-network
 
   # Discord Bot
   bot:
@@ -65,13 +103,20 @@ services:
     container_name: wikibot-bot
     restart: unless-stopped
     environment:
-      - DATABASE_URL=postgresql://wikibot:wikibot_password@postgres:5432/wikibot
       - API_URL=http://api:4000
     env_file:
       - .env
     depends_on:
       - api
+    networks:
+      - wikibot-network
 
 volumes:
   postgres_data:
   redis_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  wikibot-network:
+    driver: bridge

@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  output: 'standalone', // Pour Docker
   transpilePackages: ['@wikibot/shared'],
   images: {
     remotePatterns: [
