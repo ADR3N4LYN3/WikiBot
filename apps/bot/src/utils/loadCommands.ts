@@ -7,7 +7,9 @@ import { Command } from '../types';
 
 export function loadCommands(client: Client) {
   const commandsPath = join(__dirname, '..', 'commands');
-  const commandFiles = readdirSync(commandsPath).filter(file => file.endsWith('.ts') || file.endsWith('.js'));
+  const commandFiles = readdirSync(commandsPath).filter(file =>
+    (file.endsWith('.ts') || file.endsWith('.js')) && !file.endsWith('.d.ts')
+  );
 
   let loadedCount = 0;
 
