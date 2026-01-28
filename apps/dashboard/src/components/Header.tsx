@@ -2,12 +2,13 @@
 
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
-import { LogOut, ChevronDown, Settings, User as UserIcon } from 'lucide-react';
+import { LogOut, ChevronDown, Settings, User as UserIcon, Menu } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { ServerSelector } from './ServerSelector';
 import { ThemeToggle } from './ThemeToggle';
+import { useSidebar } from './SidebarContext';
 import { cn } from '@/lib/utils';
 import type { User } from '@/lib/types';
 
@@ -18,6 +19,7 @@ interface HeaderProps {
 export function Header({ user }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const { toggle } = useSidebar();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -32,10 +34,26 @@ export function Header({ user }: HeaderProps) {
   }, []);
 
   return (
-    <header className="h-16 glass border-b border-border/50 px-6 flex items-center justify-between sticky top-0 z-30">
-      <ServerSelector />
-
+    <header className="h-16 glass border-b border-border/50 px-4 lg:px-6 flex items-center justify-between sticky top-0 z-30">
       <div className="flex items-center gap-3">
+        {/* Mobile menu button */}
+        <button
+          onClick={toggle}
+          className={cn(
+            'lg:hidden p-2 rounded-lg',
+            'bg-muted/50 hover:bg-muted',
+            'text-muted-foreground hover:text-foreground',
+            'transition-colors duration-200'
+          )}
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
+
+        <ServerSelector />
+      </div>
+
+      <div className="flex items-center gap-2 sm:gap-3">
         {/* Theme Toggle */}
         <ThemeToggle />
 

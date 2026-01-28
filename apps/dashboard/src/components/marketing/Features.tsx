@@ -92,25 +92,26 @@ const itemVariants = {
 
 export function Features() {
   return (
-    <section id="features" className="relative py-24 overflow-hidden">
+    <section id="features" className="relative py-16 sm:py-24 overflow-hidden">
       {/* Background */}
       <div className="absolute inset-0 hero-pattern opacity-50" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <motion.div
-          className="text-center mb-16"
+          className="text-center mb-10 sm:mb-16"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
         >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
             Everything You Need to
-            <br />
+            <br className="hidden sm:block" />
+            <span className="sm:hidden"> </span>
             <GradientText>Build a Great Wiki</GradientText>
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
             Powerful features designed specifically for Discord communities.
             No coding required.
           </p>
@@ -118,7 +119,7 @@ export function Features() {
 
         {/* Features grid */}
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -126,11 +127,11 @@ export function Features() {
         >
           {features.map((feature) => (
             <motion.div key={feature.title} variants={itemVariants}>
-              <GlassCard className="h-full p-6 group">
+              <GlassCard className="h-full p-4 sm:p-6 group">
                 {/* Icon */}
                 <div
                   className={cn(
-                    'w-12 h-12 rounded-xl mb-4',
+                    'w-10 h-10 sm:w-12 sm:h-12 rounded-xl mb-3 sm:mb-4',
                     'bg-gradient-to-br',
                     feature.gradient,
                     'flex items-center justify-center',
@@ -138,14 +139,14 @@ export function Features() {
                     'group-hover:scale-110 transition-transform duration-300'
                   )}
                 >
-                  <feature.icon className="w-6 h-6 text-white" />
+                  <feature.icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 </div>
 
                 {/* Content */}
-                <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors">
+                <h3 className="text-base sm:text-lg font-semibold mb-1 sm:mb-2 group-hover:text-primary transition-colors">
                   {feature.title}
                 </h3>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   {feature.description}
                 </p>
               </GlassCard>
