@@ -1,8 +1,8 @@
 import { prisma } from '@wikibot/database';
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Response, NextFunction } from 'express';
 import { z } from 'zod';
 
-import { extractServerId } from '../middleware/auth';
+import { extractServerId, AuthenticatedRequest } from '../middleware/auth';
 
 export const settingsRouter = Router();
 
@@ -25,7 +25,7 @@ const updateSettingsSchema = z.object({
  */
 settingsRouter.get(
   '/',
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {
@@ -63,7 +63,7 @@ settingsRouter.get(
  */
 settingsRouter.put(
   '/',
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {
@@ -125,7 +125,7 @@ settingsRouter.put(
  */
 settingsRouter.post(
   '/logo/upload-url',
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {
@@ -171,7 +171,7 @@ settingsRouter.post(
  */
 settingsRouter.delete(
   '/logo',
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {

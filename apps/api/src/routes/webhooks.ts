@@ -50,7 +50,7 @@ webhooksRouter.post(
  * Discord webhook for bot events (optional)
  * POST /webhooks/discord
  */
-webhooksRouter.post('/discord', async (req: Request, res: Response) => {
+webhooksRouter.post('/discord', async (_req: Request, res: Response) => {
   // Handle Discord interaction webhooks if needed
   // This can be used for serverless deployments
   res.json({ type: 1 }); // ACK

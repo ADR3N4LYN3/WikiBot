@@ -5,6 +5,9 @@ export enum SubscriptionTier {
   PRO = 'pro',
 }
 
+// Alias for backwards compatibility
+export type PremiumTier = SubscriptionTier;
+
 // Tier limits configuration
 export const TIER_LIMITS = {
   [SubscriptionTier.FREE]: {

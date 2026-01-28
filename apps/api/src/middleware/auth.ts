@@ -2,8 +2,14 @@ import { Request, Response, NextFunction } from 'express';
 
 import { AppError } from './errorHandler';
 
+// Extended Request type with serverId
+export interface AuthenticatedRequest extends Request {
+  serverId: string;
+  userId?: string;
+}
+
 // Simple auth middleware - In production, verify JWT from NextAuth
-export function requireAuth(req: Request, res: Response, next: NextFunction) {
+export function requireAuth(req: Request, _res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -25,7 +31,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
 }
 
 // Middleware to extract serverId from request
-export function requireServerId(req: Request, res: Response, next: NextFunction) {
+export function requireServerId(req: Request, _res: Response, next: NextFunction) {
   const serverId = req.headers['x-server-id'] as string || req.query.serverId as string;
 
   if (!serverId) {
@@ -33,7 +39,10 @@ export function requireServerId(req: Request, res: Response, next: NextFunction)
   }
 
   // Attach serverId to request
-  (req as any).serverId = serverId;
+  (req as AuthenticatedRequest).serverId = serverId;
 
   next();
 }
+
+// Alias for extractServerId
+export const extractServerId = requireServerId;

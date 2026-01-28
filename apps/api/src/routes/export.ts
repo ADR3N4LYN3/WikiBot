@@ -1,10 +1,10 @@
 import { prisma } from '@wikibot/database';
-import { TIER_LIMITS, PremiumTier } from '@wikibot/shared';
+import { TIER_LIMITS, SubscriptionTier } from '@wikibot/shared';
 import archiver from 'archiver';
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Response, NextFunction } from 'express';
 import { z } from 'zod';
 
-import { extractServerId } from '../middleware/auth';
+import { extractServerId, AuthenticatedRequest } from '../middleware/auth';
 import {
   exportServerData,
   importServerData,
@@ -23,7 +23,7 @@ exportRouter.use(extractServerId);
  */
 exportRouter.get(
   '/json',
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {
@@ -51,7 +51,7 @@ exportRouter.get(
  */
 exportRouter.get(
   '/markdown',
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {
@@ -64,7 +64,7 @@ exportRouter.get(
         select: { premiumTier: true },
       });
 
-      const tier = (server?.premiumTier as PremiumTier) || 'free';
+      const tier = (server?.premiumTier as SubscriptionTier) || 'free';
       if (tier === 'free') {
         return res.status(403).json({
           error: 'Markdown export is a premium feature',
@@ -132,7 +132,7 @@ const importSchema = z.object({
  */
 exportRouter.post(
   '/import',
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       const userId = req.headers['x-user-id'] as string;
@@ -151,7 +151,7 @@ exportRouter.post(
         select: { premiumTier: true },
       });
 
-      const tier = (server?.premiumTier as PremiumTier) || 'free';
+      const tier = (server?.premiumTier as SubscriptionTier) || 'free';
       if (tier === 'free') {
         return res.status(403).json({
           error: 'Import is a premium feature',
@@ -192,7 +192,7 @@ exportRouter.post(
  */
 exportRouter.post(
   '/validate',
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     try {
       const serverId = req.serverId;
       if (!serverId) {

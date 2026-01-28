@@ -1,10 +1,10 @@
 import { prisma } from '@wikibot/database';
-import { TIER_LIMITS, PremiumTier } from '@wikibot/shared';
+import { TIER_LIMITS, SubscriptionTier } from '@wikibot/shared';
 import Stripe from 'stripe';
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-12-18.acacia',
+  apiVersion: '2023-10-16',
 });
 
 // Price IDs from Stripe Dashboard
@@ -122,7 +122,7 @@ export async function createPortalSession(
  * Get subscription status for a server
  */
 export async function getSubscriptionStatus(serverId: string): Promise<{
-  tier: PremiumTier;
+  tier: SubscriptionTier;
   isActive: boolean;
   currentPeriodEnd?: Date;
   cancelAtPeriodEnd?: boolean;
@@ -142,7 +142,7 @@ export async function getSubscriptionStatus(serverId: string): Promise<{
 
   if (!settings?.stripeSubscriptionId) {
     return {
-      tier: (server?.premiumTier as PremiumTier) || 'free',
+      tier: (server?.premiumTier as SubscriptionTier) || 'free',
       isActive: server?.premiumTier !== 'free',
     };
   }
@@ -153,7 +153,7 @@ export async function getSubscriptionStatus(serverId: string): Promise<{
     );
 
     return {
-      tier: (server?.premiumTier as PremiumTier) || 'free',
+      tier: (server?.premiumTier as SubscriptionTier) || 'free',
       isActive: subscription.status === 'active',
       currentPeriodEnd: new Date(subscription.current_period_end * 1000),
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
@@ -161,7 +161,7 @@ export async function getSubscriptionStatus(serverId: string): Promise<{
   } catch (error) {
     console.error('Failed to retrieve subscription:', error);
     return {
-      tier: (server?.premiumTier as PremiumTier) || 'free',
+      tier: (server?.premiumTier as SubscriptionTier) || 'free',
       isActive: false,
     };
   }
@@ -198,7 +198,7 @@ export async function cancelSubscription(
  */
 export async function updateServerTier(
   serverId: string,
-  tier: PremiumTier,
+  tier: SubscriptionTier,
   subscriptionId?: string
 ): Promise<void> {
   const limits = TIER_LIMITS[tier];
@@ -216,14 +216,14 @@ export async function updateServerTier(
       update: {
         maxArticles: limits.maxArticles,
         maxSearchesPerMonth: limits.maxSearchesPerMonth,
-        aiSearchEnabled: limits.aiSearch,
+        aiSearchEnabled: limits.aiSearchEnabled,
         stripeSubscriptionId: subscriptionId,
       },
       create: {
         serverId,
         maxArticles: limits.maxArticles,
         maxSearchesPerMonth: limits.maxSearchesPerMonth,
-        aiSearchEnabled: limits.aiSearch,
+        aiSearchEnabled: limits.aiSearchEnabled,
         stripeSubscriptionId: subscriptionId,
       },
     }),
@@ -300,7 +300,7 @@ export async function checkSearchLimit(serverId: string): Promise<{
 export async function getUsageStats(serverId: string): Promise<{
   articles: { current: number; max: number; percentage: number };
   searches: { current: number; max: number; percentage: number };
-  tier: PremiumTier;
+  tier: SubscriptionTier;
 }> {
   const [articleLimit, searchLimit, server] = await Promise.all([
     checkArticleLimit(serverId),
@@ -322,7 +322,7 @@ export async function getUsageStats(serverId: string): Promise<{
       max: searchLimit.max,
       percentage: Math.round((searchLimit.current / searchLimit.max) * 100),
     },
-    tier: (server?.premiumTier as PremiumTier) || 'free',
+    tier: (server?.premiumTier as SubscriptionTier) || 'free',
   };
 }
 
@@ -370,7 +370,7 @@ export async function handleWebhookEvent(event: Stripe.Event): Promise<void> {
 
       if (serverId) {
         if (subscription.status === 'active') {
-          const tier = subscription.metadata?.tier as PremiumTier;
+          const tier = subscription.metadata?.tier as SubscriptionTier;
           if (tier) {
             await updateServerTier(serverId, tier, subscription.id);
           }

@@ -5,7 +5,25 @@
       "Bash(then echo \"✅ Package found\")",
       "Bash(else echo \"❌ No package.json\")",
       "Bash(fi)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "WebFetch(domain:tld-list.com)",
+      "WebFetch(domain:www.namecheap.com)",
+      "Bash(git push:*)",
+      "Bash(git rm:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx tsc:*)",
+      "Bash(pnpm --filter @wikibot/dashboard lint:*)",
+      "Bash(pnpm --filter @wikibot/api lint:*)",
+      "Bash(pnpm --filter @wikibot/bot lint:*)",
+      "Bash(node --version:*)",
+      "Bash(npm --version:*)",
+      "Bash(npm install:*)",
+      "Bash(pnpm --version:*)",
+      "Bash(pnpm install:*)",
+      "Bash(pnpm --filter @wikibot/shared build:*)",
+      "Bash(pnpm add:*)"
     ]
   }
 }

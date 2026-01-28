@@ -1,5 +1,5 @@
 import { prisma } from '@wikibot/database';
-import { TIER_LIMITS, PremiumTier } from '@wikibot/shared';
+import { TIER_LIMITS, SubscriptionTier } from '@wikibot/shared';
 
 export interface ExportArticle {
   title: string;
@@ -120,7 +120,7 @@ async function checkImportLimits(
     }),
   ]);
 
-  const tier = (server?.premiumTier as PremiumTier) || 'free';
+  const tier = (server?.premiumTier as SubscriptionTier) || 'free';
   const maxArticles = settings?.maxArticles || TIER_LIMITS[tier].maxArticles;
 
   // Check if unlimited
