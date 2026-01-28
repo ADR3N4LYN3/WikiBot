@@ -1,6 +1,7 @@
 import { ActivityType, Events, REST, Routes } from 'discord.js';
 
 import { client } from '../index';
+import { apiClient } from '../services/apiClient';
 
 // Auto-register slash commands on startup
 async function registerCommands() {
@@ -60,6 +61,30 @@ async function updateArticleCount() {
   }
 }
 
+// Sync all servers to database on startup
+async function syncServers() {
+  console.log('🔄 Syncing servers to database...');
+
+  const guilds = client.guilds.cache;
+  let synced = 0;
+  let failed = 0;
+
+  for (const [, guild] of guilds) {
+    try {
+      await apiClient.post('/api/v1/servers', {
+        id: guild.id,
+        name: guild.name,
+      });
+      synced++;
+    } catch (error) {
+      console.error(`❌ Failed to sync server ${guild.name}:`, error);
+      failed++;
+    }
+  }
+
+  console.log(`✅ Server sync complete: ${synced} synced, ${failed} failed`);
+}
+
 function rotateStatus() {
   const status = statusMessages[currentStatusIndex];
   const serverCount = client.guilds.cache.size;
@@ -80,6 +105,9 @@ function rotateStatus() {
 client.once(Events.ClientReady, c => {
   console.log(`✅ Bot ready! Logged in as ${c.user.tag}`);
   console.log(`📊 Serving ${c.guilds.cache.size} servers`);
+
+  // Sync servers to database
+  syncServers();
 
   // Auto-register slash commands on startup
   registerCommands();

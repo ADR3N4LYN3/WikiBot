@@ -65,13 +65,10 @@ const guides = [
 ];
 
 const commands = [
-  { name: '/wiki search', description: 'Search for articles by keyword' },
-  { name: '/wiki article', description: 'Display a specific article' },
-  { name: '/wiki create', description: 'Create a new article (authorized users)' },
-  { name: '/wiki edit', description: 'Edit an existing article' },
-  { name: '/wiki delete', description: 'Delete an article' },
-  { name: '/wiki list', description: 'List all articles or by category' },
-  { name: '/wiki help', description: 'Show help information' },
+  { name: '/wiki-search <query>', description: 'Search for articles by keyword' },
+  { name: '/wiki-view <slug>', description: 'Display a specific article by its slug' },
+  { name: '/wiki-create', description: 'Create a new article (opens a form)' },
+  { name: '/wiki-help', description: 'Show all commands and how to use them' },
 ];
 
 export default function DocsPage() {
@@ -91,27 +88,10 @@ export default function DocsPage() {
               <GradientText>Documentation</GradientText>
             </h1>
 
-            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
+            <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
               Everything you need to know about setting up and using WikiBot
               for your Discord community.
             </p>
-
-            {/* Search */}
-            <div className="max-w-xl mx-auto">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="text"
-                  placeholder="Search documentation..."
-                  className={cn(
-                    'w-full pl-12 pr-4 py-4 rounded-xl',
-                    'bg-muted/50 border border-border',
-                    'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
-                    'transition-all duration-300'
-                  )}
-                />
-              </div>
-            </div>
           </div>
         </section>
 

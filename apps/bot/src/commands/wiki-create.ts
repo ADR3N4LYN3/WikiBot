@@ -15,13 +15,13 @@ import { Command } from '../types';
 
 const command: Command = {
   data: new SlashCommandBuilder()
-    .setName('create')
+    .setName('wiki-create')
     .setDescription('Create a new article in the knowledge base'),
 
   async execute(interaction: ChatInputCommandInteraction) {
     // Create modal for article input
     const modal = new ModalBuilder()
-      .setCustomId('create-article-modal')
+      .setCustomId('wiki-create-article-modal')
       .setTitle('Create New Article');
 
     // Title input
@@ -64,7 +64,7 @@ const command: Command = {
 
     // Listen for modal submission
     const filter = (i: ModalSubmitInteraction) =>
-      i.customId === 'create-article-modal' && i.user.id === interaction.user.id;
+      i.customId === 'wiki-create-article-modal' && i.user.id === interaction.user.id;
 
     try {
       const modalInteraction = await interaction.awaitModalSubmit({
@@ -116,7 +116,7 @@ const command: Command = {
           }
         )
         .setFooter({
-          text: `Use /view ${article.slug} to view this article`,
+          text: `Use /wiki-view ${article.slug} to view this article`,
         });
 
       await modalInteraction.editReply({ embeds: [embed] });

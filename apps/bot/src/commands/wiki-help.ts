@@ -12,7 +12,7 @@ import { Command } from '../types';
 
 const command: Command = {
   data: new SlashCommandBuilder()
-    .setName('help')
+    .setName('wiki-help')
     .setDescription('Show all available commands and how to use them'),
 
   async execute(interaction: ChatInputCommandInteraction) {
@@ -25,21 +25,21 @@ const command: Command = {
       )
       .addFields(
         {
-          name: '🔍 /search `query`',
+          name: '🔍 /wiki-search `query`',
           value: 'Search for articles in your server\'s knowledge base.\n' +
-                 '**Example:** `/search how to setup`',
+                 '**Example:** `/wiki-search how to setup`',
         },
         {
-          name: '📖 /view `slug`',
+          name: '📖 /wiki-view `slug`',
           value: 'View a specific article by its slug (URL-friendly name).\n' +
-                 '**Example:** `/view getting-started`',
+                 '**Example:** `/wiki-view getting-started`',
         },
         {
-          name: '✏️ /create',
+          name: '✏️ /wiki-create',
           value: 'Create a new article. Opens a form to enter the title, content, and optional category.',
         },
         {
-          name: '❓ /help',
+          name: '❓ /wiki-help',
           value: 'Show this help message with all available commands.',
         }
       )

@@ -10,7 +10,7 @@ import { Command } from '../types';
 
 const command: Command = {
   data: new SlashCommandBuilder()
-    .setName('search')
+    .setName('wiki-search')
     .setDescription('Search for articles in the knowledge base')
     .addStringOption(option =>
       option
@@ -72,12 +72,12 @@ const command: Command = {
 
         embed.addFields({
           name: `${result.categoryEmoji || '📄'} ${result.title || 'Untitled'}`,
-          value: `${excerpt}${excerpt.length >= 100 ? '...' : ''}\n\`/view ${result.slug}\` • ${views} views • ${helpful} helpful`,
+          value: `${excerpt}${excerpt.length >= 100 ? '...' : ''}\n\`/wiki-view ${result.slug}\` • ${views} views • ${helpful} helpful`,
         });
       }
 
       embed.setFooter({
-        text: `Use /view [slug] to read full articles`,
+        text: `Use /wiki-view [slug] to read full articles`,
       });
 
       await interaction.editReply({ embeds: [embed] });

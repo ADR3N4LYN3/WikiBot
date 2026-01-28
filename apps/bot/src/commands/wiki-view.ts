@@ -6,7 +6,7 @@ import { Command } from '../types';
 
 const command: Command = {
   data: new SlashCommandBuilder()
-    .setName('view')
+    .setName('wiki-view')
     .setDescription('View an article from the knowledge base')
     .addStringOption(option =>
       option
