@@ -31,7 +31,7 @@ const releases: Release[] = [
   {
     version: '2.2.0',
     date: '2025-01-28',
-    title: 'MEE6-Inspired UX Improvements',
+    title: 'Dashboard UX Improvements',
     changes: [
       { type: 'feature', description: 'Quick Actions bar on dashboard for fast access to common tasks' },
       { type: 'feature', description: 'Modules page with toggle switches to enable/disable features' },
@@ -39,52 +39,6 @@ const releases: Release[] = [
       { type: 'feature', description: 'Onboarding wizard for new users with guided setup' },
       { type: 'feature', description: 'Real-time stats on landing page from public API' },
       { type: 'improvement', description: 'Global keyboard shortcuts throughout dashboard' },
-    ],
-  },
-  {
-    version: '2.1.0',
-    date: '2024-01-15',
-    title: 'AI-Powered Search',
-    changes: [
-      { type: 'feature', description: 'AI-powered search suggestions for better results' },
-      { type: 'feature', description: 'Natural language search support' },
-      { type: 'improvement', description: 'Faster article loading times' },
-      { type: 'fix', description: 'Fixed category sorting on mobile' },
-    ],
-  },
-  {
-    version: '2.0.0',
-    date: '2024-01-01',
-    title: 'WikiBot 2.0 - Complete Redesign',
-    changes: [
-      { type: 'feature', description: 'Brand new dashboard with glassmorphism design' },
-      { type: 'feature', description: 'Dark/Light mode with system preference detection' },
-      { type: 'feature', description: 'Enhanced analytics with 90-day history' },
-      { type: 'feature', description: 'Public wiki pages for web sharing' },
-      { type: 'improvement', description: 'Complete UI/UX overhaul' },
-      { type: 'improvement', description: 'Better mobile responsiveness' },
-      { type: 'fix', description: 'Various performance improvements' },
-    ],
-  },
-  {
-    version: '1.5.0',
-    date: '2023-12-15',
-    title: 'Multi-Server Support',
-    changes: [
-      { type: 'feature', description: 'Manage multiple Discord servers from one dashboard' },
-      { type: 'feature', description: 'Server-specific article permissions' },
-      { type: 'improvement', description: 'Improved search algorithm' },
-    ],
-  },
-  {
-    version: '1.4.0',
-    date: '2023-12-01',
-    title: 'Analytics Dashboard',
-    changes: [
-      { type: 'feature', description: 'Detailed analytics for article views' },
-      { type: 'feature', description: 'Search query insights' },
-      { type: 'improvement', description: 'Better category management' },
-      { type: 'fix', description: 'Fixed duplicate article issue' },
     ],
   },
 ];

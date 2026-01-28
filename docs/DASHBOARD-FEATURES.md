@@ -43,7 +43,7 @@ import { QuickActions } from '@/components/QuickActions';
 
 **Localisation**: `/dashboard/modules`
 
-Page de configuration des modules du bot, inspirée du dashboard MEE6.
+Page de configuration des modules du bot.
 
 ### Modules disponibles
 

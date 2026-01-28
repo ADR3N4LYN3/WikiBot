@@ -15,7 +15,7 @@ WikiBot is a Discord bot with a web dashboard for managing collaborative knowled
 
 ### Dashboard UX (New!)
 - ⚡ **Quick Actions Bar** - Fast access to common actions from the dashboard
-- 🎛️ **Modules Page** - Enable/disable features with toggle switches (MEE6-style)
+- 🎛️ **Modules Page** - Enable/disable features with toggle switches
 - ⌨️ **Command Palette** - Press `Ctrl+K` for quick navigation and search
 - 🎉 **Onboarding Wizard** - Guided setup for new users (create first category & article)
 

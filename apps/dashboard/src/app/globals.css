@@ -30,7 +30,7 @@
     --glass-shadow: 250 85% 60% / 0.1;
   }
 
-  /* Dark Mode - MEE6 inspired */
+  /* Dark Mode */
   .dark {
     --background: 230 25% 7%;
     --foreground: 210 40% 98%;
