@@ -2,10 +2,19 @@
   "name": "@wikibot/database",
   "version": "0.1.0",
   "private": true,
-  "main": "./src/client.ts",
+  "main": "./dist/client.js",
+  "types": "./dist/client.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/client.d.ts",
+      "import": "./dist/client.js",
+      "require": "./dist/client.js",
+      "default": "./dist/client.js"
+    }
+  },
   "scripts": {
     "dev": "echo 'Database package does not have a dev script'",
-    "build": "prisma generate",
+    "build": "prisma generate && tsc",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",

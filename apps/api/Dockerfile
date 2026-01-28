@@ -25,10 +25,8 @@ COPY packages/shared ./packages/shared
 COPY packages/config ./packages/config
 COPY apps/api ./apps/api
 
-# Generate Prisma client
-RUN pnpm --filter @wikibot/database db:generate
-
-# Build packages
+# Build packages (database includes prisma generate)
+RUN pnpm --filter @wikibot/database build
 RUN pnpm --filter @wikibot/shared build
 RUN pnpm --filter @wikibot/api build
 
