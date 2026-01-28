@@ -1,6 +1,41 @@
-import { ActivityType, Events } from 'discord.js';
+import { ActivityType, Events, REST, Routes } from 'discord.js';
 
 import { client } from '../index';
+
+// Auto-register slash commands on startup
+async function registerCommands() {
+  const clientId = process.env.DISCORD_CLIENT_ID;
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+
+  if (!clientId || !botToken) {
+    console.warn('⚠️  Missing DISCORD_CLIENT_ID or DISCORD_BOT_TOKEN, skipping command registration');
+    return;
+  }
+
+  try {
+    // Get commands from client collection
+    const commands = Array.from(client.commands.values()).map(cmd => cmd.data.toJSON());
+
+    if (commands.length === 0) {
+      console.warn('⚠️  No commands to register');
+      return;
+    }
+
+    const rest = new REST().setToken(botToken);
+
+    console.log(`🔄 Registering ${commands.length} slash commands...`);
+
+    await rest.put(
+      Routes.applicationCommands(clientId),
+      { body: commands }
+    );
+
+    console.log(`✅ Successfully registered ${commands.length} slash commands globally`);
+  } catch (error) {
+    console.error('❌ Failed to register commands:', error);
+    // Don't exit - bot can still work with existing commands
+  }
+}
 
 // Rotating status messages
 const statusMessages = [
@@ -45,6 +80,9 @@ function rotateStatus() {
 client.once(Events.ClientReady, c => {
   console.log(`✅ Bot ready! Logged in as ${c.user.tag}`);
   console.log(`📊 Serving ${c.guilds.cache.size} servers`);
+
+  // Auto-register slash commands on startup
+  registerCommands();
 
   // Initial status
   rotateStatus();
