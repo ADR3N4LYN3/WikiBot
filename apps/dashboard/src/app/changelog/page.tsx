@@ -29,16 +29,18 @@ interface Release {
 
 const releases: Release[] = [
   {
-    version: '2.2.0',
+    version: '1.0.0',
     date: '2025-01-28',
-    title: 'Dashboard UX Improvements',
+    title: 'Initial Release',
     changes: [
-      { type: 'feature', description: 'Quick Actions bar on dashboard for fast access to common tasks' },
-      { type: 'feature', description: 'Modules page with toggle switches to enable/disable features' },
-      { type: 'feature', description: 'Command Palette (Ctrl+K) for quick navigation and search' },
-      { type: 'feature', description: 'Onboarding wizard for new users with guided setup' },
-      { type: 'feature', description: 'Real-time stats on landing page from public API' },
-      { type: 'improvement', description: 'Global keyboard shortcuts throughout dashboard' },
+      { type: 'feature', description: 'Discord bot with slash commands for wiki management' },
+      { type: 'feature', description: 'Web dashboard for article and category management' },
+      { type: 'feature', description: 'Full-text search with AI-powered semantic search (premium)' },
+      { type: 'feature', description: 'Analytics dashboard with usage statistics' },
+      { type: 'feature', description: 'Command Palette (Ctrl+K) for quick navigation' },
+      { type: 'feature', description: 'Onboarding wizard for new users' },
+      { type: 'feature', description: 'Modules page to enable/disable features' },
+      { type: 'feature', description: 'Public wiki pages for web sharing' },
     ],
   },
 ];
