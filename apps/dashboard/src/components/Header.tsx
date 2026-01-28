@@ -2,10 +2,13 @@
 
 import Image from 'next/image';
 import { signOut } from 'next-auth/react';
-import { LogOut, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { LogOut, ChevronDown, Settings, User as UserIcon } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { ServerSelector } from './ServerSelector';
+import { ThemeToggle } from './ThemeToggle';
+import { cn } from '@/lib/utils';
 import type { User } from '@/lib/types';
 
 interface HeaderProps {
@@ -14,50 +17,163 @@ interface HeaderProps {
 
 export function Header({ user }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
-    <header className="h-16 bg-card border-b px-6 flex items-center justify-between">
+    <header className="h-16 glass border-b border-border/50 px-6 flex items-center justify-between sticky top-0 z-30">
       <ServerSelector />
 
-      <div className="relative">
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors"
-        >
-          {user?.image ? (
-            <Image
-              src={user.image}
-              alt={user.name || 'User'}
-              width={32}
-              height={32}
-              className="rounded-full"
-            />
-          ) : (
-            <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center text-primary-foreground text-sm font-medium">
-              {user?.name?.[0] || 'U'}
-            </div>
-          )}
-          <span className="font-medium">{user?.name || 'User'}</span>
-          <ChevronDown className="w-4 h-4 text-muted-foreground" />
-        </button>
+      <div className="flex items-center gap-3">
+        {/* Theme Toggle */}
+        <ThemeToggle />
 
-        {menuOpen && (
-          <>
-            <div
-              className="fixed inset-0 z-10"
-              onClick={() => setMenuOpen(false)}
-            />
-            <div className="absolute right-0 top-full mt-2 w-48 bg-card border rounded-lg shadow-lg py-1 z-20">
-              <button
-                onClick={() => signOut({ callbackUrl: '/login' })}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-destructive hover:bg-muted transition-colors"
-              >
-                <LogOut className="w-4 h-4" />
-                Sign out
-              </button>
+        {/* User Menu */}
+        <div className="relative" ref={menuRef}>
+          <motion.button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className={cn(
+              'flex items-center gap-3 px-3 py-2 rounded-xl',
+              'hover:bg-muted/50 transition-colors duration-300',
+              'border border-transparent hover:border-border/50',
+              menuOpen && 'bg-muted/50 border-border/50'
+            )}
+            whileTap={{ scale: 0.98 }}
+          >
+            {/* Avatar with gradient ring */}
+            <div className="relative">
+              <div
+                className={cn(
+                  'absolute -inset-0.5 rounded-full',
+                  'bg-gradient-to-r from-primary via-secondary to-accent',
+                  'opacity-0 group-hover:opacity-100 transition-opacity',
+                  'blur-sm'
+                )}
+              />
+              {user?.image ? (
+                <Image
+                  src={user.image}
+                  alt={user.name || 'User'}
+                  width={36}
+                  height={36}
+                  className="relative rounded-full ring-2 ring-border"
+                />
+              ) : (
+                <div
+                  className={cn(
+                    'relative w-9 h-9 rounded-full',
+                    'bg-gradient-to-br from-primary to-secondary',
+                    'flex items-center justify-center',
+                    'text-white text-sm font-semibold',
+                    'ring-2 ring-border'
+                  )}
+                >
+                  {user?.name?.[0] || 'U'}
+                </div>
+              )}
+
+              {/* Online indicator */}
+              <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-card rounded-full" />
             </div>
-          </>
-        )}
+
+            <div className="hidden sm:block text-left">
+              <p className="text-sm font-medium">{user?.name || 'User'}</p>
+              <p className="text-xs text-muted-foreground">Administrator</p>
+            </div>
+
+            <ChevronDown
+              className={cn(
+                'w-4 h-4 text-muted-foreground transition-transform duration-300',
+                menuOpen && 'rotate-180'
+              )}
+            />
+          </motion.button>
+
+          <AnimatePresence>
+            {menuOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className={cn(
+                  'absolute right-0 top-full mt-2 w-56',
+                  'glass rounded-xl border border-border/50',
+                  'shadow-xl shadow-black/10 dark:shadow-primary/5',
+                  'overflow-hidden'
+                )}
+              >
+                {/* User info section */}
+                <div className="px-4 py-3 border-b border-border/50 bg-muted/30">
+                  <p className="text-sm font-medium">{user?.name || 'User'}</p>
+                  <p className="text-xs text-muted-foreground truncate">
+                    {user?.email || 'user@example.com'}
+                  </p>
+                </div>
+
+                {/* Menu items */}
+                <div className="py-1">
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 px-4 py-2.5',
+                      'text-sm text-muted-foreground',
+                      'hover:bg-muted/50 hover:text-foreground',
+                      'transition-colors duration-200'
+                    )}
+                  >
+                    <UserIcon className="w-4 h-4" />
+                    Profile
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setMenuOpen(false);
+                    }}
+                    className={cn(
+                      'w-full flex items-center gap-3 px-4 py-2.5',
+                      'text-sm text-muted-foreground',
+                      'hover:bg-muted/50 hover:text-foreground',
+                      'transition-colors duration-200'
+                    )}
+                  >
+                    <Settings className="w-4 h-4" />
+                    Settings
+                  </button>
+                </div>
+
+                {/* Sign out */}
+                <div className="py-1 border-t border-border/50">
+                  <button
+                    onClick={() => signOut({ callbackUrl: '/login' })}
+                    className={cn(
+                      'w-full flex items-center gap-3 px-4 py-2.5',
+                      'text-sm text-destructive',
+                      'hover:bg-destructive/10',
+                      'transition-colors duration-200'
+                    )}
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign out
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </header>
   );

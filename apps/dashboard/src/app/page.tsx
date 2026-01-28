@@ -1,13 +1,28 @@
 import { redirect } from 'next/navigation';
 
 import { auth } from '@/lib/auth';
+import { Navbar } from '@/components/marketing/Navbar';
+import { Hero } from '@/components/marketing/Hero';
+import { Features } from '@/components/marketing/Features';
+import { Pricing } from '@/components/marketing/Pricing';
+import { Footer } from '@/components/marketing/Footer';
 
-export default async function Home() {
+export default async function HomePage() {
   const session = await auth();
 
+  // Redirect to dashboard if already logged in
   if (session) {
     redirect('/dashboard');
   }
 
-  redirect('/login');
+  // Show landing page for non-authenticated users
+  return (
+    <main className="min-h-screen">
+      <Navbar />
+      <Hero />
+      <Features />
+      <Pricing />
+      <Footer />
+    </main>
+  );
 }
