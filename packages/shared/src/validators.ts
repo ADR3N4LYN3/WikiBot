@@ -107,13 +107,8 @@ export const paginationSchema = z.object({
   limit: z.number().int().min(1).max(100).default(20),
 });
 
-// Type inference helpers
-export type ArticleCreateInput = z.infer<typeof articleCreateSchema>;
-export type ArticleUpdateInput = z.infer<typeof articleUpdateSchema>;
-export type CategoryCreateInput = z.infer<typeof categoryCreateSchema>;
-export type CategoryUpdateInput = z.infer<typeof categoryUpdateSchema>;
+// Type inference helpers (only for types not already defined in types/index.ts)
 export type SearchQueryInput = z.infer<typeof searchQuerySchema>;
-export type ServerSettingsUpdateInput = z.infer<typeof serverSettingsUpdateSchema>;
 export type ExportDataInput = z.infer<typeof exportDataSchema>;
 export type DiscordUserInput = z.infer<typeof discordUserSchema>;
 export type PaginationInput = z.infer<typeof paginationSchema>;

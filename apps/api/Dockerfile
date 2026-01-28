@@ -12,6 +12,8 @@ COPY package.json pnpm-lock.yaml ./
 # Copy package.json files for all workspaces
 COPY packages/database/package.json ./packages/database/
 COPY packages/shared/package.json ./packages/shared/
+COPY packages/config/tsconfig/package.json ./packages/config/tsconfig/
+COPY packages/config/eslint-config/package.json ./packages/config/eslint-config/
 COPY apps/api/package.json ./apps/api/
 
 # Install dependencies
@@ -20,6 +22,7 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY packages/database ./packages/database
 COPY packages/shared ./packages/shared
+COPY packages/config ./packages/config
 COPY apps/api ./apps/api
 
 # Generate Prisma client
