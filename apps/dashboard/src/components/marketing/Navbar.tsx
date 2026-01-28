@@ -11,9 +11,9 @@ import { GradientButton } from '../ui/GradientButton';
 import { GradientText } from '../ui/GradientText';
 
 const navLinks = [
-  { name: 'Features', href: '#features' },
-  { name: 'Pricing', href: '#pricing' },
-  { name: 'FAQ', href: '#faq' },
+  { name: 'Features', href: '/#features' },
+  { name: 'Pricing', href: '/#pricing' },
+  { name: 'FAQ', href: '/#faq' },
 ];
 
 export function Navbar() {

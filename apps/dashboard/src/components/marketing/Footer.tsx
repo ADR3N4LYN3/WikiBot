@@ -8,9 +8,9 @@ import { GradientText } from '../ui/GradientText';
 
 const footerLinks = {
   Product: [
-    { name: 'Features', href: '#features' },
-    { name: 'Pricing', href: '#pricing' },
-    { name: 'FAQ', href: '#faq' },
+    { name: 'Features', href: '/#features' },
+    { name: 'Pricing', href: '/#pricing' },
+    { name: 'FAQ', href: '/#faq' },
     { name: 'Changelog', href: '/changelog' },
   ],
   Company: [
