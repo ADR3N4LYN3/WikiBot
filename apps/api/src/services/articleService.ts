@@ -1,4 +1,4 @@
-import { prisma } from '@wikibot/database';
+import { prisma, Prisma } from '@wikibot/database';
 import { ArticleCreateInput, ArticleUpdateInput } from '@wikibot/shared';
 
 import { AppError } from '../middleware/errorHandler';
@@ -15,7 +15,7 @@ interface GetArticlesOptions {
 export async function getArticles(options: GetArticlesOptions) {
   const { serverId, categoryId, published, limit, offset } = options;
 
-  const where: any = { serverId };
+  const where: Prisma.ArticleWhereInput = { serverId };
 
   if (categoryId) {
     where.categoryId = categoryId;

@@ -16,8 +16,8 @@ searchRouter.use(searchRateLimiter);
 // Search articles
 searchRouter.get('/', async (req, res, next) => {
   try {
-    const serverId = (req as any).serverId;
-    const userId = (req as any).user?.id || 'anonymous';
+    const serverId = req.serverId!;
+    const userId = req.user?.id || 'anonymous';
 
     const input = searchQuerySchema.parse({
       query: req.query.q || req.query.query,

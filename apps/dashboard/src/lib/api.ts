@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+import type { ExportData } from './types';
+
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
   headers: {
@@ -98,7 +100,7 @@ export const settingsApi = {
 export const exportApi = {
   exportJson: () => api.get('/api/v1/export/json'),
   exportMarkdown: () => api.get('/api/v1/export/markdown', { responseType: 'blob' }),
-  importJson: (data: any, options?: { overwriteExisting?: boolean; importCategories?: boolean }) =>
+  importJson: (data: ExportData, options?: { overwriteExisting?: boolean; importCategories?: boolean }) =>
     api.post('/api/v1/export/import', { data, ...options }),
-  validate: (data: any) => api.post('/api/v1/export/validate', { data }),
+  validate: (data: ExportData) => api.post('/api/v1/export/validate', { data }),
 };

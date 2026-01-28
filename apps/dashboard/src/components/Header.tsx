@@ -6,9 +6,10 @@ import { LogOut, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
 import { ServerSelector } from './ServerSelector';
+import type { User } from '@/lib/types';
 
 interface HeaderProps {
-  user: any;
+  user: User;
 }
 
 export function Header({ user }: HeaderProps) {

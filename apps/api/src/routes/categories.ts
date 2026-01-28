@@ -13,7 +13,7 @@ categoriesRouter.use(requireServerId);
 // Get all categories for a server
 categoriesRouter.get('/', async (req, res, next) => {
   try {
-    const serverId = (req as any).serverId;
+    const serverId = req.serverId!;
 
     const categories = await categoryService.getCategories(serverId);
 
@@ -26,7 +26,7 @@ categoriesRouter.get('/', async (req, res, next) => {
 // Create category
 categoriesRouter.post('/', async (req, res, next) => {
   try {
-    const serverId = (req as any).serverId;
+    const serverId = req.serverId!;
     const input = categoryCreateSchema.parse(req.body);
 
     const category = await categoryService.createCategory(serverId, input);
@@ -40,7 +40,7 @@ categoriesRouter.post('/', async (req, res, next) => {
 // Update category
 categoriesRouter.put('/:slug', async (req, res, next) => {
   try {
-    const serverId = (req as any).serverId;
+    const serverId = req.serverId!;
     const { slug } = req.params;
     const input = categoryUpdateSchema.parse(req.body);
 
@@ -55,7 +55,7 @@ categoriesRouter.put('/:slug', async (req, res, next) => {
 // Delete category
 categoriesRouter.delete('/:slug', async (req, res, next) => {
   try {
-    const serverId = (req as any).serverId;
+    const serverId = req.serverId!;
     const { slug } = req.params;
 
     await categoryService.deleteCategory(serverId, slug);

@@ -14,7 +14,7 @@ articlesRouter.use(requireServerId);
 // Get all articles for a server
 articlesRouter.get('/', async (req, res, next) => {
   try {
-    const serverId = (req as any).serverId;
+    const serverId = req.serverId!;
     const { categoryId, published, limit = 20, offset = 0 } = req.query;
 
     const articles = await articleService.getArticles({
@@ -34,7 +34,7 @@ articlesRouter.get('/', async (req, res, next) => {
 // Get article by slug
 articlesRouter.get('/:slug', async (req, res, next) => {
   try {
-    const serverId = (req as any).serverId;
+    const serverId = req.serverId!;
     const { slug } = req.params;
 
     const article = await articleService.getArticleBySlug(serverId, slug);
@@ -48,8 +48,8 @@ articlesRouter.get('/:slug', async (req, res, next) => {
 // Create article
 articlesRouter.post('/', async (req, res, next) => {
   try {
-    const serverId = (req as any).serverId;
-    const userId = (req as any).user?.id || 'system'; // TODO: Get from JWT
+    const serverId = req.serverId!;
+    const userId = req.user?.id || 'system'; // TODO: Get from JWT
 
     const input = articleCreateSchema.parse(req.body);
 
@@ -68,9 +68,9 @@ articlesRouter.post('/', async (req, res, next) => {
 // Update article
 articlesRouter.put('/:slug', async (req, res, next) => {
   try {
-    const serverId = (req as any).serverId;
+    const serverId = req.serverId!;
     const { slug } = req.params;
-    const userId = (req as any).user?.id || 'system';
+    const userId = req.user?.id || 'system';
 
     const input = articleUpdateSchema.parse(req.body);
 
@@ -85,7 +85,7 @@ articlesRouter.put('/:slug', async (req, res, next) => {
 // Delete article
 articlesRouter.delete('/:slug', async (req, res, next) => {
   try {
-    const serverId = (req as any).serverId;
+    const serverId = req.serverId!;
     const { slug } = req.params;
 
     await articleService.deleteArticle(serverId, slug);
@@ -99,7 +99,7 @@ articlesRouter.delete('/:slug', async (req, res, next) => {
 // Increment article views
 articlesRouter.post('/:slug/view', async (req, res, next) => {
   try {
-    const serverId = (req as any).serverId;
+    const serverId = req.serverId!;
     const { slug } = req.params;
 
     await articleService.incrementViews(serverId, slug);
@@ -113,7 +113,7 @@ articlesRouter.post('/:slug/view', async (req, res, next) => {
 // Vote on article helpfulness
 articlesRouter.post('/:slug/vote', async (req, res, next) => {
   try {
-    const serverId = (req as any).serverId;
+    const serverId = req.serverId!;
     const { slug } = req.params;
     const { helpful } = req.body;
 

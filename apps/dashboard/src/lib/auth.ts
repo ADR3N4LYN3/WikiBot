@@ -23,8 +23,8 @@ const nextAuth = NextAuth({
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).discordId = token.discordId;
-        (session as any).accessToken = token.accessToken;
+        session.user.discordId = token.discordId;
+        session.accessToken = token.accessToken;
       }
       return session;
     },

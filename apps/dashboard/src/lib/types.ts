@@ -68,3 +68,20 @@ export interface ApiError {
     };
   };
 }
+
+// User type for session
+export interface User {
+  id?: string;
+  name?: string | null;
+  email?: string | null;
+  image?: string | null;
+  discordId?: string;
+}
+
+// Export data type
+export interface ExportData {
+  articles?: Article[];
+  categories?: Category[];
+  version?: string;
+  exportedAt?: string;
+}
