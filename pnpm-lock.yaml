@@ -251,6 +251,9 @@ importers:
         specifier: ^5.9.0
         version: 5.22.0(prisma@5.22.0)
     devDependencies:
+      '@wikibot/tsconfig':
+        specifier: workspace:*
+        version: link:../config/tsconfig
       prisma:
         specifier: ^5.9.0
         version: 5.22.0

@@ -7,10 +7,11 @@ import toast from 'react-hot-toast';
 
 import { categoriesApi } from '@/lib/api';
 import { generateSlug } from '@/lib/utils';
+import type { Category, ApiError } from '@/lib/types';
 
 export default function CategoriesPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<any>(null);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [emoji, setEmoji] = useState('');
@@ -19,7 +20,7 @@ export default function CategoriesPage() {
     categoriesApi.getAll().then((res) => res.data)
   );
 
-  const openModal = (category?: any) => {
+  const openModal = (category?: Category) => {
     if (category) {
       setEditingCategory(category);
       setName(category.name);
@@ -69,8 +70,9 @@ export default function CategoriesPage() {
       }
       mutate();
       closeModal();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to save category');
+    } catch (error) {
+      const apiError = error as ApiError;
+      toast.error(apiError.response?.data?.message || 'Failed to save category');
     }
   };
 
@@ -106,7 +108,7 @@ export default function CategoriesPage() {
       <div className="bg-card rounded-xl border">
         {categories?.length ? (
           <div className="divide-y">
-            {categories.map((category: any) => (
+            {categories.map((category: Category) => (
               <div
                 key={category.id}
                 className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors"

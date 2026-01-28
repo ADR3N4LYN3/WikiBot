@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 
 import { ArticleEditor } from '@/components/ArticleEditor';
 import { articlesApi, categoriesApi } from '@/lib/api';
+import type { Category, ApiError } from '@/lib/types';
 
 export default function EditArticlePage() {
   const router = useRouter();
@@ -67,8 +68,9 @@ export default function EditArticlePage() {
 
       toast.success('Article updated successfully!');
       router.push('/dashboard/articles');
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to update article');
+    } catch (error) {
+      const apiError = error as ApiError;
+      toast.error(apiError.response?.data?.message || 'Failed to update article');
     } finally {
       setIsSubmitting(false);
     }
@@ -113,7 +115,7 @@ export default function EditArticlePage() {
               className="w-full px-4 py-2 bg-background border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <option value="">No category</option>
-              {categories?.map((cat: any) => (
+              {categories?.map((cat: Category) => (
                 <option key={cat.id} value={cat.slug}>
                   {cat.emoji} {cat.name}
                 </option>

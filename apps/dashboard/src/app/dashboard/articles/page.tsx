@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 
 import { articlesApi, categoriesApi } from '@/lib/api';
 import { formatDate, formatNumber } from '@/lib/utils';
+import type { Article, Category } from '@/lib/types';
 
 export default function ArticlesPage() {
   const [search, setSearch] = useState('');
@@ -21,7 +22,7 @@ export default function ArticlesPage() {
   );
 
   const articles = articlesData?.articles || [];
-  const filteredArticles = articles.filter((article: any) =>
+  const filteredArticles = articles.filter((article: Article) =>
     article.title.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -73,7 +74,7 @@ export default function ArticlesPage() {
           className="px-4 py-2 bg-card border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
         >
           <option value="">All Categories</option>
-          {categories?.map((cat: any) => (
+          {categories?.map((cat: Category) => (
             <option key={cat.id} value={cat.id}>
               {cat.emoji} {cat.name}
             </option>
@@ -104,7 +105,7 @@ export default function ArticlesPage() {
             </tr>
           </thead>
           <tbody className="divide-y">
-            {filteredArticles.map((article: any) => (
+            {filteredArticles.map((article: Article) => (
               <tr key={article.id} className="hover:bg-muted/30 transition-colors">
                 <td className="px-6 py-4">
                   <div>

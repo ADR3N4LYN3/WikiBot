@@ -14,6 +14,7 @@ import {
 
 import { analyticsApi } from '@/lib/api';
 import { formatNumber } from '@/lib/utils';
+import type { TopArticle } from '@/lib/types';
 
 export default function DashboardPage() {
   const { data: overview } = useSWR('analytics-overview', () =>
@@ -122,7 +123,7 @@ export default function DashboardPage() {
         <div className="bg-card p-6 rounded-xl border">
           <h2 className="text-lg font-semibold mb-4">Top Articles</h2>
           <div className="space-y-4">
-            {topArticles?.map((article: any, index: number) => (
+            {topArticles?.map((article: TopArticle, index: number) => (
               <div
                 key={article.id}
                 className="flex items-center gap-3 py-2 border-b last:border-0"
