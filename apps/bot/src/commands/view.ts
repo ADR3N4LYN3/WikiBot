@@ -89,24 +89,21 @@ const command: Command = {
         components: [row],
       });
 
-      // Increment views
-      await apiClient.post(
+      // Increment views (fire & forget)
+      apiClient.post(
         `/api/v1/articles/${slug}/view`,
         {},
-        {
-          headers: {
-            'X-Server-Id': serverId,
-          },
-        }
-      );
-    } catch (error: any) {
+        { headers: { 'X-Server-Id': serverId } }
+      ).catch((err) => console.error('Failed to increment views:', err));
+    } catch (error: unknown) {
       console.error('View article error:', error);
 
+      const err = error as { response?: { status?: number } };
       const embed = new EmbedBuilder()
         .setColor(DISCORD_COLORS.RED)
         .setTitle('❌ Article Not Found')
         .setDescription(
-          error.response?.status === 404
+          err.response?.status === 404
             ? `No article found with slug "${slug}"`
             : 'An error occurred while fetching the article.'
         );

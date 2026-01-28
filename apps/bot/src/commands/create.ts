@@ -1,12 +1,13 @@
 import { DISCORD_COLORS } from '@wikibot/shared';
 import {
   SlashCommandBuilder,
-  CommandInteraction,
+  ChatInputCommandInteraction,
   ModalBuilder,
   TextInputBuilder,
   TextInputStyle,
   ActionRowBuilder,
   EmbedBuilder,
+  ModalSubmitInteraction,
 } from 'discord.js';
 
 import { apiClient } from '../services/apiClient';
@@ -17,7 +18,7 @@ const command: Command = {
     .setName('create')
     .setDescription('Create a new article in the knowledge base'),
 
-  async execute(interaction: CommandInteraction) {
+  async execute(interaction: ChatInputCommandInteraction) {
     // Create modal for article input
     const modal = new ModalBuilder()
       .setCustomId('create-article-modal')
@@ -62,7 +63,7 @@ const command: Command = {
     await interaction.showModal(modal);
 
     // Listen for modal submission
-    const filter = (i: any) =>
+    const filter = (i: ModalSubmitInteraction) =>
       i.customId === 'create-article-modal' && i.user.id === interaction.user.id;
 
     try {
@@ -119,11 +120,12 @@ const command: Command = {
         });
 
       await modalInteraction.editReply({ embeds: [embed] });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Create article error:', error);
 
       // Modal timeout or error
-      if (error.code === 'InteractionCollectorError') {
+      const err = error as { code?: string; response?: { data?: { message?: string } } };
+      if (err.code === 'InteractionCollectorError') {
         // Modal timed out, ignore
         return;
       }
@@ -132,7 +134,7 @@ const command: Command = {
         .setColor(DISCORD_COLORS.RED)
         .setTitle('❌ Failed to Create Article')
         .setDescription(
-          error.response?.data?.message || 'An error occurred while creating the article.'
+          err.response?.data?.message || 'An error occurred while creating the article.'
         );
 
       try {

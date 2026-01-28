@@ -2,11 +2,11 @@ import 'dotenv/config';
 import { readdirSync } from 'fs';
 import { join } from 'path';
 
-import { REST, Routes } from 'discord.js';
+import { REST, Routes, RESTPostAPIChatInputApplicationCommandsJSONBody } from 'discord.js';
 
 import { Command } from '../types';
 
-const commands: any[] = [];
+const commands: RESTPostAPIChatInputApplicationCommandsJSONBody[] = [];
 
 // Load all commands
 const commandsPath = join(__dirname, '..', 'commands');
@@ -27,10 +27,10 @@ const rest = new REST().setToken(process.env.DISCORD_BOT_TOKEN!);
   try {
     console.log(`🔄 Started refreshing ${commands.length} application (/) commands.`);
 
-    const data: any = await rest.put(
+    const data = await rest.put(
       Routes.applicationCommands(process.env.DISCORD_CLIENT_ID!),
       { body: commands }
-    );
+    ) as RESTPostAPIChatInputApplicationCommandsJSONBody[];
 
     console.log(`✅ Successfully reloaded ${data.length} application (/) commands.`);
   } catch (error) {
