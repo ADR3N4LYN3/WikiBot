@@ -4,6 +4,7 @@ import { Toaster } from 'react-hot-toast';
 
 import './globals.css';
 import { Providers } from '@/components/Providers';
+import { CookieBanner } from '@/components/CookieBanner';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -23,6 +24,7 @@ export default function RootLayout({
         <Providers>
           {children}
           <Toaster position="bottom-right" />
+          <CookieBanner />
         </Providers>
       </body>
     </html>
