@@ -1,24 +1,6 @@
 version: '3.8'
 
 services:
-  # Caddy Reverse Proxy (HTTPS automatique)
-  caddy:
-    image: caddy:2-alpine
-    container_name: wikibot-caddy
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      - caddy_data:/data
-      - caddy_config:/config
-    depends_on:
-      - dashboard
-      - api
-    networks:
-      - wikibot-network
-
   # Next.js Dashboard
   dashboard:
     build:
@@ -26,8 +8,8 @@ services:
       dockerfile: apps/dashboard/Dockerfile
     container_name: wikibot-dashboard
     restart: unless-stopped
-    expose:
-      - "3000"
+    ports:
+      - "3001:3000"
     environment:
       - NEXTAUTH_URL=https://wikibot-app.xyz
       - NEXT_PUBLIC_API_URL=https://api.wikibot-app.xyz
@@ -35,27 +17,6 @@ services:
       - .env
     depends_on:
       - api
-    networks:
-      - wikibot-network
-
-  # PostgreSQL Database (local dev only - use Supabase in prod)
-  postgres:
-    image: postgres:15-alpine
-    container_name: wikibot-db
-    restart: unless-stopped
-    profiles:
-      - local
-    environment:
-      POSTGRES_USER: wikibot
-      POSTGRES_PASSWORD: wikibot_password
-      POSTGRES_DB: wikibot
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U wikibot"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
     networks:
       - wikibot-network
 
@@ -81,8 +42,8 @@ services:
       dockerfile: apps/api/Dockerfile
     container_name: wikibot-api
     restart: unless-stopped
-    expose:
-      - "4000"
+    ports:
+      - "4000:4000"
     environment:
       - REDIS_URL=redis://redis:6379
       - API_PORT=4000
@@ -112,10 +73,7 @@ services:
       - wikibot-network
 
 volumes:
-  postgres_data:
   redis_data:
-  caddy_data:
-  caddy_config:
 
 networks:
   wikibot-network:
