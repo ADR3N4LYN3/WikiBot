@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 const values = [
   {
     icon: Users,
-    title: 'Community First',
+    title: 'Community first',
     description: 'We build for Discord communities, listening to feedback and constantly improving.',
   },
   {
@@ -26,7 +26,7 @@ const values = [
   },
   {
     icon: Heart,
-    title: 'Open & Transparent',
+    title: 'Open & transparent',
     description: 'We believe in transparency. Our roadmap and changelog are always public.',
   },
 ];

@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-import { cn } from '@/lib/utils';
+import { cn, slugify } from '@/lib/utils';
 import { categoriesApi, articlesApi } from '@/lib/api';
 import { WelcomeStep } from './steps/WelcomeStep';
 import { CategoryStep } from './steps/CategoryStep';
@@ -30,6 +30,7 @@ export function OnboardingWizard({ onComplete, onSkip }: OnboardingWizardProps) 
     try {
       await categoriesApi.create({
         name: category.name,
+        slug: slugify(category.name),
         emoji: category.emoji,
       });
       setCategoryData(category);

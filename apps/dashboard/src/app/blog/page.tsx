@@ -1,6 +1,5 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
-import { Calendar, ArrowRight, Clock } from 'lucide-react';
+import { Calendar, Clock } from 'lucide-react';
 
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GradientText } from '@/components/ui/GradientText';
@@ -87,29 +86,27 @@ export default function BlogPage() {
         {featuredPost && (
           <section className="py-8">
             <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-              <Link href={`/blog/${featuredPost.id}`}>
-                <GlassCard className="p-6 sm:p-10 group cursor-pointer hover:border-primary/50 transition-colors">
-                  <Badge variant="premium" glow className="mb-4">
-                    Featured
-                  </Badge>
-                  <h2 className="text-2xl sm:text-3xl font-bold mb-4 group-hover:text-primary transition-colors">
-                    {featuredPost.title}
-                  </h2>
-                  <p className="text-muted-foreground mb-6 max-w-2xl">
-                    {featuredPost.excerpt}
-                  </p>
-                  <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-4 h-4" />
-                      {formatDate(featuredPost.date)}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4" />
-                      {featuredPost.readTime}
-                    </span>
-                  </div>
-                </GlassCard>
-              </Link>
+              <GlassCard className="p-6 sm:p-10">
+                <Badge variant="premium" glow className="mb-4">
+                  Featured
+                </Badge>
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4">
+                  {featuredPost.title}
+                </h2>
+                <p className="text-muted-foreground mb-6 max-w-2xl">
+                  {featuredPost.excerpt}
+                </p>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <Calendar className="w-4 h-4" />
+                    {formatDate(featuredPost.date)}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-4 h-4" />
+                    {featuredPost.readTime}
+                  </span>
+                </div>
+              </GlassCard>
             </div>
           </section>
         )}
@@ -119,26 +116,23 @@ export default function BlogPage() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {regularPosts.map((post) => (
-                <Link key={post.id} href={`/blog/${post.id}`}>
-                  <GlassCard className="h-full p-6 group cursor-pointer hover:border-primary/50 transition-colors">
-                    <Badge variant="default" className="mb-4">
-                      {post.category}
+                <GlassCard key={post.id} className="h-full p-6">
+                  <Badge variant="default" className="mb-4">
+                    {post.category}
+                  </Badge>
+                  <h3 className="text-lg font-semibold mb-2 line-clamp-2">
+                    {post.title}
+                  </h3>
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                    {post.excerpt}
+                  </p>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mt-auto">
+                    <span>{formatDate(post.date)}</span>
+                    <Badge variant="default" className="text-xs">
+                      Coming soon
                     </Badge>
-                    <h3 className="text-lg font-semibold mb-2 group-hover:text-primary transition-colors line-clamp-2">
-                      {post.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                      {post.excerpt}
-                    </p>
-                    <div className="flex items-center justify-between text-xs text-muted-foreground mt-auto">
-                      <span>{formatDate(post.date)}</span>
-                      <span className="flex items-center gap-1">
-                        Read more
-                        <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
-                      </span>
-                    </div>
-                  </GlassCard>
-                </Link>
+                  </div>
+                </GlassCard>
               ))}
             </div>
           </div>

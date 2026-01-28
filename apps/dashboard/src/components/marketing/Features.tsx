@@ -19,14 +19,14 @@ import { GradientText } from '../ui/GradientText';
 const features = [
   {
     icon: Search,
-    title: 'Instant Search',
+    title: 'Instant search',
     description:
       'Find any article in seconds with powerful slash commands. Fuzzy search and autocomplete included.',
     gradient: 'from-primary to-secondary',
   },
   {
     icon: BookOpen,
-    title: 'Rich Articles',
+    title: 'Rich articles',
     description:
       'Create beautiful articles with markdown support, code blocks, images, and more.',
     gradient: 'from-secondary to-accent',
@@ -47,28 +47,28 @@ const features = [
   },
   {
     icon: Zap,
-    title: 'Lightning Fast',
+    title: 'Lightning fast',
     description:
       'Responses in milliseconds. No loading, no waiting. Just answers.',
     gradient: 'from-yellow-500 to-orange-500',
   },
   {
     icon: Users,
-    title: 'Multi-Server',
+    title: 'Multi-server',
     description:
       'Manage multiple Discord servers from a single dashboard. Sync articles across servers.',
     gradient: 'from-pink-500 to-rose-500',
   },
   {
     icon: Globe,
-    title: 'Public Wiki',
+    title: 'Public wiki',
     description:
       'Optionally make your wiki public on the web. SEO-friendly and shareable.',
     gradient: 'from-cyan-500 to-blue-500',
   },
   {
     icon: Sparkles,
-    title: 'AI-Powered',
+    title: 'AI-powered',
     description:
       'Coming soon: AI-powered article suggestions and automatic answers.',
     gradient: 'from-purple-500 to-violet-500',

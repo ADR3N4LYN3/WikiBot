@@ -32,6 +32,8 @@ export function generateSlug(text: string): string {
     .replace(/^-+|-+$/g, '');
 }
 
+export const slugify = generateSlug;
+
 export function truncate(text: string, length: number): string {
   if (text.length <= length) return text;
   return text.slice(0, length) + '...';

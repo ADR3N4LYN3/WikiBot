@@ -17,48 +17,48 @@ export const metadata: Metadata = {
 const quickLinks = [
   {
     icon: Zap,
-    title: 'Quick Start',
+    title: 'Quick start',
     description: 'Get WikiBot running in your server in under 5 minutes',
-    href: '/docs/quick-start',
+    href: '#quick-start',
   },
   {
     icon: Terminal,
     title: 'Commands',
     description: 'Complete list of all slash commands and how to use them',
-    href: '/docs/commands',
+    href: '#commands',
   },
   {
     icon: Settings,
     title: 'Dashboard',
     description: 'Learn how to use the web dashboard to manage your wiki',
-    href: '/docs/dashboard',
+    href: '#dashboard',
   },
   {
     icon: Shield,
     title: 'Permissions',
     description: 'Set up role-based permissions for your team',
-    href: '/docs/permissions',
+    href: '#permissions',
   },
 ];
 
 const guides = [
   {
-    title: 'Creating Your First Article',
+    title: 'Creating your first article',
     description: 'Step-by-step guide to creating and publishing articles',
     icon: FileText,
   },
   {
-    title: 'Organizing with Categories',
+    title: 'Organizing with categories',
     description: 'Learn how to structure your wiki with categories',
     icon: BookOpen,
   },
   {
-    title: 'Using Search Effectively',
+    title: 'Using search effectively',
     description: 'Tips for making your content easy to find',
     icon: Search,
   },
   {
-    title: 'Moderating Your Wiki',
+    title: 'Moderating your wiki',
     description: 'Best practices for wiki moderation',
     icon: Shield,
   },

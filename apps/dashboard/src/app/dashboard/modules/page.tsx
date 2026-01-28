@@ -11,6 +11,7 @@ import {
   Sparkles,
   Shield,
   Zap,
+  LucideIcon,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -24,7 +25,7 @@ interface ModuleConfig {
   id: string;
   name: string;
   description: string;
-  icon: React.ElementType;
+  icon: LucideIcon;
   isPremium?: boolean;
   isCore?: boolean;
   settingsKey: string;
@@ -152,7 +153,7 @@ export default function ModulesPage() {
   };
 
   const isModuleDisabled = (module: ModuleConfig): boolean => {
-    return module.isPremium && settings?.premiumTier === 'free';
+    return !!(module.isPremium && settings?.premiumTier === 'free');
   };
 
   const enabledCount = MODULES.filter((m) => isModuleEnabled(m)).length;

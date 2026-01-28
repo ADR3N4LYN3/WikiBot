@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import Link from 'next/link';
 import { Briefcase, MapPin, Clock, ArrowRight, Heart, Zap, Users } from 'lucide-react';
 
 import { GlassCard } from '@/components/ui/GlassCard';
@@ -17,17 +16,17 @@ export const metadata: Metadata = {
 const benefits = [
   {
     icon: Zap,
-    title: 'Remote First',
+    title: 'Remote first',
     description: 'Work from anywhere in the world. We\'re a fully distributed team.',
   },
   {
     icon: Heart,
-    title: 'Health & Wellness',
+    title: 'Health & wellness',
     description: 'Comprehensive health insurance and wellness benefits.',
   },
   {
     icon: Users,
-    title: 'Great Team',
+    title: 'Great team',
     description: 'Work with passionate people who love what they do.',
   },
 ];
@@ -35,21 +34,21 @@ const benefits = [
 const openPositions = [
   {
     id: 1,
-    title: 'Senior Full-Stack Engineer',
+    title: 'Senior full-stack engineer',
     department: 'Engineering',
     location: 'Remote',
     type: 'Full-time',
   },
   {
     id: 2,
-    title: 'Product Designer',
+    title: 'Product designer',
     department: 'Design',
     location: 'Remote',
     type: 'Full-time',
   },
   {
     id: 3,
-    title: 'Community Manager',
+    title: 'Community manager',
     department: 'Community',
     location: 'Remote',
     type: 'Full-time',
@@ -68,7 +67,7 @@ export default function CareersPage() {
 
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <Badge variant="premium" glow className="mb-6">
-              We&apos;re Hiring
+              We&apos;re hiring
             </Badge>
 
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
@@ -112,7 +111,7 @@ export default function CareersPage() {
 
             <div className="space-y-4">
               {openPositions.map((position) => (
-                <Link key={position.id} href={`/careers/${position.id}`}>
+                <a key={position.id} href={`mailto:careers@wikibot-app.xyz?subject=Application: ${position.title}`}>
                   <GlassCard className="p-6 group cursor-pointer hover:border-primary/50 transition-colors">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div>
@@ -137,7 +136,7 @@ export default function CareersPage() {
                       <ArrowRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
                     </div>
                   </GlassCard>
-                </Link>
+                </a>
               ))}
             </div>
 

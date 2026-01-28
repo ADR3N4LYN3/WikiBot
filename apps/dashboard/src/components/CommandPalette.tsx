@@ -7,7 +7,7 @@ import { Search, Command as CommandIcon } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 import { useCommandPalette } from '@/hooks/useCommandPalette';
-import { createCommands, filterCommands, type CommandSection } from '@/lib/commands';
+import { createCommands, filterCommands } from '@/lib/commands';
 
 export function CommandPalette() {
   const router = useRouter();

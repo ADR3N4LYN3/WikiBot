@@ -14,40 +14,55 @@ const plans = [
   {
     name: 'Free',
     price: '0',
-    description: 'Perfect for small communities',
+    description: 'Perfect for getting started',
     features: [
-      'Up to 50 articles',
+      'Up to 25 articles',
       '1 Discord server',
       'Basic search',
       'Community support',
       '7-day analytics',
     ],
-    cta: 'Get Started',
+    cta: 'Get started',
     href: '/invite',
+    popular: false,
+  },
+  {
+    name: 'Pro',
+    price: '4.99',
+    description: 'For active communities',
+    features: [
+      'Up to 200 articles',
+      'Up to 3 servers',
+      'Advanced search',
+      'Email support',
+      '30-day analytics',
+      'Public web wiki',
+    ],
+    cta: 'Start free trial',
+    href: '/dashboard/settings/billing',
     popular: false,
   },
   {
     name: 'Premium',
     price: '9.99',
-    description: 'For growing communities',
+    description: 'For large communities',
     features: [
       'Unlimited articles',
       'Unlimited servers',
       'Advanced search & filters',
       'Priority support',
       '90-day analytics',
-      'Public web wiki',
       'Custom branding',
       'API access',
     ],
-    cta: 'Upgrade Now',
+    cta: 'Upgrade now',
     href: '/dashboard/settings/billing',
     popular: true,
   },
   {
     name: 'Enterprise',
     price: 'Custom',
-    description: 'For large organizations',
+    description: 'For organizations',
     features: [
       'Everything in Premium',
       'Dedicated support',
@@ -55,9 +70,8 @@ const plans = [
       'Custom integrations',
       'SSO / SAML',
       'Audit logs',
-      'On-premise option',
     ],
-    cta: 'Contact Sales',
+    cta: 'Contact sales',
     href: 'mailto:contact@wikibot-app.xyz',
     popular: false,
   },
@@ -79,10 +93,10 @@ export function Pricing() {
           transition={{ duration: 0.5 }}
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4">
-            Simple, Transparent
+            Simple, transparent
             <br className="hidden sm:block" />
             <span className="sm:hidden"> </span>
-            <GradientText>Pricing</GradientText>
+            <GradientText>pricing</GradientText>
           </h2>
           <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto px-4">
             Start free, upgrade when you need more. No hidden fees.
@@ -90,7 +104,7 @@ export function Pricing() {
         </motion.div>
 
         {/* Pricing cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 max-w-7xl mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
@@ -112,7 +126,7 @@ export function Pricing() {
                   <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2">
                     <Badge variant="premium" glow className="px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm">
                       <Crown className="w-3 h-3" />
-                      Most Popular
+                      Most popular
                     </Badge>
                   </div>
                 )}
