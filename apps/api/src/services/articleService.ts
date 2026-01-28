@@ -216,7 +216,8 @@ export async function updateArticle(
 }
 
 export async function deleteArticle(serverId: string, slug: string) {
-  const article = await getArticleBySlug(serverId, slug);
+  // Verify article exists before deleting
+  await getArticleBySlug(serverId, slug);
 
   await prisma.article.delete({
     where: {

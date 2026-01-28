@@ -1,6 +1,6 @@
+import { categoryCreateSchema, categoryUpdateSchema } from '@wikibot/shared';
 import { Router } from 'express';
 
-import { categoryCreateSchema, categoryUpdateSchema } from '@wikibot/shared';
 
 import { requireAuth, requireServerId } from '../middleware/auth';
 import * as categoryService from '../services/categoryService';

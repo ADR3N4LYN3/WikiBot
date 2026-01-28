@@ -1,6 +1,6 @@
+import { RATE_LIMITS } from '@wikibot/shared';
 import rateLimit from 'express-rate-limit';
 
-import { RATE_LIMITS } from '@wikibot/shared';
 
 // General rate limiter for all routes
 export const rateLimiter = rateLimit({

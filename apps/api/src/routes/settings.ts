@@ -1,6 +1,6 @@
+import { prisma } from '@wikibot/database';
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { prisma } from '@wikibot/database';
 
 import { extractServerId } from '../middleware/auth';
 

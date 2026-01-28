@@ -1,21 +1,19 @@
 import 'dotenv/config';
-import express from 'express';
 import cors from 'cors';
+import express from 'express';
 import helmet from 'helmet';
 
 import { errorHandler } from './middleware/errorHandler';
 import { rateLimiter } from './middleware/rateLimiter';
-
-// Routes
-import { healthRouter } from './routes/health';
-import { articlesRouter } from './routes/articles';
-import { searchRouter } from './routes/search';
-import { categoriesRouter } from './routes/categories';
 import { analyticsRouter } from './routes/analytics';
-import { webhooksRouter } from './routes/webhooks';
-import { subscriptionsRouter } from './routes/subscriptions';
+import { articlesRouter } from './routes/articles';
+import { categoriesRouter } from './routes/categories';
 import { exportRouter } from './routes/export';
+import { healthRouter } from './routes/health';
+import { searchRouter } from './routes/search';
 import { settingsRouter } from './routes/settings';
+import { subscriptionsRouter } from './routes/subscriptions';
+import { webhooksRouter } from './routes/webhooks';
 
 const app = express();
 const PORT = process.env.API_PORT || 4000;

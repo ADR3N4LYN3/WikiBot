@@ -1,6 +1,6 @@
+import { articleCreateSchema, articleUpdateSchema } from '@wikibot/shared';
 import { Router } from 'express';
 
-import { articleCreateSchema, articleUpdateSchema } from '@wikibot/shared';
 
 import { requireAuth, requireServerId } from '../middleware/auth';
 import * as articleService from '../services/articleService';

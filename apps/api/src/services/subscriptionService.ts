@@ -1,6 +1,6 @@
-import Stripe from 'stripe';
 import { prisma } from '@wikibot/database';
 import { TIER_LIMITS, PremiumTier } from '@wikibot/shared';
+import Stripe from 'stripe';
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {

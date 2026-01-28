@@ -1,5 +1,5 @@
 import { prisma } from '@wikibot/database';
-import { SearchQuery, SearchResponse, SEARCH_LIMITS } from '@wikibot/shared';
+import { SearchQuery, SearchResponse } from '@wikibot/shared';
 
 import { semanticSearch } from './embeddingService';
 import { isAISearchEnabled, generateRAGAnswer } from './ragService';
@@ -46,7 +46,7 @@ async function semanticSearchArticles(
   serverId: string,
   query: string,
   limit: number,
-  searchLogId: string
+  _searchLogId: string
 ): Promise<SearchResponse> {
   try {
     // Perform semantic search using Pinecone

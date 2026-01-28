@@ -1,5 +1,5 @@
-import OpenAI from 'openai';
 import { prisma } from '@wikibot/database';
+import OpenAI from 'openai';
 
 import { semanticSearch } from './embeddingService';
 

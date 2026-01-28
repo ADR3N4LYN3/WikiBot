@@ -1,6 +1,6 @@
+import { searchQuerySchema } from '@wikibot/shared';
 import { Router } from 'express';
 
-import { searchQuerySchema } from '@wikibot/shared';
 
 import { requireAuth, requireServerId } from '../middleware/auth';
 import { searchRateLimiter } from '../middleware/rateLimiter';

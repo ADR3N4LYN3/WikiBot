@@ -15,9 +15,9 @@ export class AppError extends Error {
 
 export function errorHandler(
   err: Error | AppError | ZodError,
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) {
   // Log error
   console.error('❌ Error:', err);

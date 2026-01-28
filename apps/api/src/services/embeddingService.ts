@@ -1,6 +1,6 @@
-import OpenAI from 'openai';
 import { Pinecone } from '@pinecone-database/pinecone';
 import { prisma } from '@wikibot/database';
+import OpenAI from 'openai';
 
 // Initialize OpenAI
 const openai = new OpenAI({

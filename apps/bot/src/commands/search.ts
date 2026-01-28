@@ -1,15 +1,12 @@
+import { DISCORD_COLORS } from '@wikibot/shared';
 import {
   SlashCommandBuilder,
   CommandInteraction,
   EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
 } from 'discord.js';
 
-import { Command } from '../types';
 import { apiClient } from '../services/apiClient';
-import { DISCORD_COLORS } from '@wikibot/shared';
+import { Command } from '../types';
 
 const command: Command = {
   data: new SlashCommandBuilder()

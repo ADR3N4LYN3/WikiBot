@@ -1,6 +1,7 @@
-import { Client } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
+
+import { Client } from 'discord.js';
 
 import { Command } from '../types';
 
@@ -12,6 +13,7 @@ export function loadCommands(client: Client) {
 
   for (const file of commandFiles) {
     const filePath = join(commandsPath, file);
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const command: Command = require(filePath).default;
 
     if ('data' in command && 'execute' in command) {

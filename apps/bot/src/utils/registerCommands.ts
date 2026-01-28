@@ -1,7 +1,8 @@
 import 'dotenv/config';
-import { REST, Routes } from 'discord.js';
 import { readdirSync } from 'fs';
 import { join } from 'path';
+
+import { REST, Routes } from 'discord.js';
 
 import { Command } from '../types';
 
@@ -12,6 +13,7 @@ const commandsPath = join(__dirname, '..', 'commands');
 const commandFiles = readdirSync(commandsPath).filter(file => file.endsWith('.ts') || file.endsWith('.js'));
 
 for (const file of commandFiles) {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
   const command: Command = require(join(commandsPath, file)).default;
   if (command.data) {
     commands.push(command.data.toJSON());
