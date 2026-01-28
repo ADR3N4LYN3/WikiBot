@@ -1,5 +1,8 @@
 FROM node:20-alpine AS base
 
+# Install OpenSSL for Prisma
+RUN apk add --no-cache openssl
+
 # Install pnpm
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
@@ -32,6 +35,9 @@ RUN pnpm --filter @wikibot/api build
 
 # Production stage
 FROM node:20-alpine AS production
+
+# Install OpenSSL for Prisma runtime
+RUN apk add --no-cache openssl
 
 RUN corepack enable && corepack prepare pnpm@latest --activate
 
