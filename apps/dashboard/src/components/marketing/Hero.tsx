@@ -3,20 +3,61 @@
 import Link from 'next/link';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Sparkles, ArrowRight, Users, BookOpen, Search } from 'lucide-react';
+import useSWR from 'swr';
 
 import { cn } from '@/lib/utils';
 import { GradientButton } from '../ui/GradientButton';
 import { GradientText } from '../ui/GradientText';
 import { Badge } from '../ui/Badge';
 
-const stats = [
-  { label: 'Discord Servers', value: '1,000+', icon: Users },
-  { label: 'Articles Created', value: '50,000+', icon: BookOpen },
-  { label: 'Searches/Month', value: '500K+', icon: Search },
-];
+// Format number with K/M suffix
+function formatStat(num: number): string {
+  if (num >= 1000000) {
+    return `${(num / 1000000).toFixed(1)}M+`;
+  }
+  if (num >= 1000) {
+    return `${(num / 1000).toFixed(0)}K+`;
+  }
+  return `${num}+`;
+}
+
+// Fetcher for public stats
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
+interface PublicStats {
+  servers: number;
+  articles: number;
+  searches: number;
+}
 
 export function Hero() {
   const prefersReducedMotion = useReducedMotion();
+
+  // Fetch live stats from API
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+  const { data: liveStats } = useSWR<PublicStats>(
+    `${apiUrl}/api/public/stats`,
+    fetcher,
+    { refreshInterval: 60000 } // Refresh every minute
+  );
+
+  const stats = [
+    {
+      label: 'Discord Servers',
+      value: liveStats ? formatStat(liveStats.servers) : '...',
+      icon: Users
+    },
+    {
+      label: 'Articles Created',
+      value: liveStats ? formatStat(liveStats.articles) : '...',
+      icon: BookOpen
+    },
+    {
+      label: 'Searches/Month',
+      value: liveStats ? formatStat(liveStats.searches) : '...',
+      icon: Search
+    },
+  ];
 
   // Simplified animations for reduced motion or mobile
   const orbAnimation = prefersReducedMotion

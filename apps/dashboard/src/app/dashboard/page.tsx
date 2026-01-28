@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import useSWR from 'swr';
 import { BookOpen, Search, Eye, FolderOpen, TrendingUp, ArrowUpRight } from 'lucide-react';
 import {
@@ -11,7 +12,7 @@ import {
   Area,
   AreaChart,
 } from 'recharts';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 import { analyticsApi } from '@/lib/api';
 import { formatNumber, cn } from '@/lib/utils';
@@ -19,6 +20,8 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { GradientText } from '@/components/ui/GradientText';
 import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
 import { Badge } from '@/components/ui/Badge';
+import { QuickActions } from '@/components/QuickActions';
+import { OnboardingWizard } from '@/components/onboarding';
 import type { TopArticle } from '@/lib/types';
 
 const containerVariants = {
@@ -36,16 +39,43 @@ const itemVariants = {
   visible: { opacity: 1, y: 0 },
 };
 
+const ONBOARDING_KEY = 'wikibot-onboarding-completed';
+
 export default function DashboardPage() {
-  const { data: overview } = useSWR('analytics-overview', () =>
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  const { data: overview, mutate: mutateOverview } = useSWR('analytics-overview', () =>
     analyticsApi.getOverview().then((res) => res.data)
   );
-  const { data: topArticles } = useSWR('top-articles', () =>
+  const { data: topArticles, mutate: mutateTopArticles } = useSWR('top-articles', () =>
     analyticsApi.getTopArticles(5).then((res) => res.data)
   );
   const { data: activity } = useSWR('activity', () =>
     analyticsApi.getActivity(30).then((res) => res.data)
   );
+
+  // Check if we should show onboarding
+  useEffect(() => {
+    if (overview !== undefined) {
+      const onboardingCompleted = localStorage.getItem(ONBOARDING_KEY);
+      if (!onboardingCompleted && overview.totalArticles === 0) {
+        setShowOnboarding(true);
+      }
+    }
+  }, [overview]);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem(ONBOARDING_KEY, 'true');
+    setShowOnboarding(false);
+    // Refresh data after onboarding
+    mutateOverview();
+    mutateTopArticles();
+  };
+
+  const handleOnboardingSkip = () => {
+    localStorage.setItem(ONBOARDING_KEY, 'true');
+    setShowOnboarding(false);
+  };
 
   const stats = [
     {
@@ -91,13 +121,24 @@ export default function DashboardPage() {
   ];
 
   return (
-    <motion.div
-      className="space-y-6"
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-    >
-      {/* Header */}
+    <>
+      {/* Onboarding Wizard */}
+      <AnimatePresence>
+        {showOnboarding && (
+          <OnboardingWizard
+            onComplete={handleOnboardingComplete}
+            onSkip={handleOnboardingSkip}
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        className="space-y-6"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* Header */}
       <motion.div variants={itemVariants}>
         <h1 className="text-3xl font-bold">
           Welcome back, <GradientText>Admin</GradientText>
@@ -105,6 +146,11 @@ export default function DashboardPage() {
         <p className="text-muted-foreground mt-1">
           Here&apos;s what&apos;s happening with your wiki today
         </p>
+      </motion.div>
+
+      {/* Quick Actions */}
+      <motion.div variants={itemVariants}>
+        <QuickActions />
       </motion.div>
 
       {/* Stats Grid */}
@@ -307,6 +353,7 @@ export default function DashboardPage() {
           </GlassCard>
         </motion.div>
       </div>
-    </motion.div>
+      </motion.div>
+    </>
   );
 }

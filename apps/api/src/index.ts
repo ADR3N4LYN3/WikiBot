@@ -10,6 +10,7 @@ import { articlesRouter } from './routes/articles';
 import { categoriesRouter } from './routes/categories';
 import { exportRouter } from './routes/export';
 import { healthRouter } from './routes/health';
+import { publicRouter } from './routes/public';
 import { searchRouter } from './routes/search';
 import { settingsRouter } from './routes/settings';
 import { subscriptionsRouter } from './routes/subscriptions';
@@ -37,6 +38,7 @@ app.use(rateLimiter);
 
 // Routes
 app.use('/health', healthRouter);
+app.use('/api/public', publicRouter);
 app.use('/api/v1/articles', articlesRouter);
 app.use('/api/v1/search', searchRouter);
 app.use('/api/v1/categories', categoriesRouter);

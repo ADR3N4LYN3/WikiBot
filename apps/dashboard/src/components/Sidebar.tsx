@@ -11,6 +11,7 @@ import {
   Sparkles,
   Crown,
   X,
+  ToggleRight,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -23,6 +24,7 @@ const navigation = [
   { name: 'Articles', href: '/dashboard/articles', icon: BookOpen },
   { name: 'Categories', href: '/dashboard/categories', icon: FolderOpen },
   { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+  { name: 'Modules', href: '/dashboard/modules', icon: ToggleRight },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 
