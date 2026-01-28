@@ -123,8 +123,8 @@ export function Pricing() {
               >
                 {/* Popular badge */}
                 {plan.popular && (
-                  <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2">
-                    <Badge variant="premium" glow className="px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm">
+                  <div className="absolute -top-3 sm:-top-4 left-1/2 -translate-x-1/2 z-10">
+                    <Badge variant="premium" glow className="px-3 sm:px-4 py-1 sm:py-1.5 text-xs sm:text-sm whitespace-nowrap">
                       <Crown className="w-3 h-3" />
                       Most popular
                     </Badge>
@@ -132,7 +132,7 @@ export function Pricing() {
                 )}
 
                 {/* Plan header */}
-                <div className="text-center mb-6 sm:mb-8">
+                <div className={cn("text-center mb-6 sm:mb-8", plan.popular && "pt-4")}>
                   <h3 className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2">{plan.name}</h3>
                   <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
                     {plan.description}
