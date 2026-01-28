@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { CheckCircle, AlertCircle, Clock, Activity, Server, Database, Globe } from 'lucide-react';
+import { CheckCircle, AlertCircle, Activity, Server, Database, Globe } from 'lucide-react';
 
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GradientText } from '@/components/ui/GradientText';
@@ -40,22 +40,7 @@ const services = [
   },
 ];
 
-const incidents = [
-  {
-    id: 1,
-    title: 'Scheduled maintenance complete',
-    status: 'resolved',
-    date: '2024-01-14',
-    description: 'Database optimization completed successfully. All services are back to normal.',
-  },
-  {
-    id: 2,
-    title: 'Minor API latency',
-    status: 'resolved',
-    date: '2024-01-10',
-    description: 'Some users experienced increased API response times. Issue has been resolved.',
-  },
-];
+// No incidents to display
 
 function getStatusColor(status: string) {
   switch (status) {
@@ -159,17 +144,14 @@ export default function StatusPage() {
 
             <GlassCard className="p-6">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-4xl font-bold text-green-500">99.98%</span>
+                <span className="text-4xl font-bold text-green-500">99.99%</span>
                 <span className="text-sm text-muted-foreground">Total uptime</span>
               </div>
               <div className="flex gap-1">
                 {Array.from({ length: 90 }).map((_, i) => (
                   <div
                     key={i}
-                    className={cn(
-                      'flex-1 h-8 rounded-sm',
-                      i === 45 ? 'bg-yellow-500' : 'bg-green-500'
-                    )}
+                    className="flex-1 h-8 rounded-sm bg-green-500"
                     title={`Day ${90 - i}`}
                   />
                 ))}
@@ -187,25 +169,13 @@ export default function StatusPage() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl font-bold mb-6">Recent incidents</h2>
 
-            <div className="space-y-4">
-              {incidents.map((incident) => (
-                <GlassCard key={incident.id} className="p-6">
-                  <div className="flex items-start justify-between mb-2">
-                    <h3 className="font-semibold">{incident.title}</h3>
-                    <Badge variant="success">Resolved</Badge>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-2">{incident.description}</p>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Clock className="w-3 h-3" />
-                    {new Date(incident.date).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric',
-                    })}
-                  </div>
-                </GlassCard>
-              ))}
-            </div>
+            <GlassCard className="p-8 text-center">
+              <CheckCircle className="w-12 h-12 mx-auto text-green-500 mb-4" />
+              <h3 className="text-lg font-semibold mb-2">No incidents</h3>
+              <p className="text-muted-foreground">
+                All systems have been running smoothly. No incidents to report.
+              </p>
+            </GlassCard>
           </div>
         </section>
 

@@ -15,38 +15,38 @@ export const metadata: Metadata = {
 const posts = [
   {
     id: 1,
-    title: 'Introducing WikiBot 2.0: A Complete Redesign',
-    excerpt: 'We\'ve completely redesigned WikiBot with a new dashboard, better performance, and more features than ever before.',
-    date: '2024-01-15',
-    readTime: '5 min read',
+    title: 'WikiBot 1.0 is Here!',
+    excerpt: 'We\'re excited to announce the official launch of WikiBot! Create, organize, and search your Discord knowledge base with ease using simple slash commands.',
+    date: '2026-01-28',
+    readTime: '3 min read',
     category: 'Announcement',
     featured: true,
   },
   {
     id: 2,
-    title: 'How to Organize Your Discord Wiki for Maximum Engagement',
-    excerpt: 'Learn best practices for structuring your knowledge base so your community can find answers quickly.',
-    date: '2024-01-10',
+    title: 'Getting Started with WikiBot: A Complete Guide',
+    excerpt: 'Learn how to set up WikiBot in your Discord server, create your first articles, organize them into categories, and make the most of the search functionality.',
+    date: '2026-01-25',
     readTime: '8 min read',
     category: 'Tutorial',
     featured: false,
   },
   {
     id: 3,
-    title: 'New Feature: AI-Powered Search Suggestions',
-    excerpt: 'Our new AI feature helps users find what they\'re looking for, even when they don\'t know the exact keywords.',
-    date: '2024-01-05',
-    readTime: '4 min read',
-    category: 'Feature',
+    title: '5 Best Practices for Discord Knowledge Bases',
+    excerpt: 'Discover proven strategies to structure your wiki for maximum engagement: clear naming conventions, smart categorization, and keeping content fresh.',
+    date: '2026-01-20',
+    readTime: '6 min read',
+    category: 'Guide',
     featured: false,
   },
   {
     id: 4,
-    title: 'Case Study: How Gaming Community Grew to 100K Members',
-    excerpt: 'See how one gaming community used WikiBot to scale their support and grow their Discord server.',
-    date: '2024-01-01',
-    readTime: '6 min read',
-    category: 'Case Study',
+    title: 'Understanding AI-Powered Search in WikiBot',
+    excerpt: 'Deep dive into how our semantic search works, when to use it versus full-text search, and tips to optimize your articles for better discoverability.',
+    date: '2026-01-15',
+    readTime: '5 min read',
+    category: 'Feature',
     featured: false,
   },
 ];
@@ -126,11 +126,9 @@ export default function BlogPage() {
                   <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
                     {post.excerpt}
                   </p>
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mt-auto">
+                  <div className="flex items-center gap-4 text-xs text-muted-foreground mt-auto">
                     <span>{formatDate(post.date)}</span>
-                    <Badge variant="default" className="text-xs">
-                      Coming soon
-                    </Badge>
+                    <span>{post.readTime}</span>
                   </div>
                 </GlassCard>
               ))}

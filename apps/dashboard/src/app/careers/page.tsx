@@ -4,7 +4,6 @@ import { Briefcase, Heart, Zap, Users } from 'lucide-react';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GradientText } from '@/components/ui/GradientText';
 import { GradientButton } from '@/components/ui/GradientButton';
-import { Badge } from '@/components/ui/Badge';
 import { Navbar } from '@/components/marketing/Navbar';
 import { Footer } from '@/components/marketing/Footer';
 
@@ -42,17 +41,13 @@ export default function CareersPage() {
           <div className="absolute inset-0 hero-pattern opacity-30" />
 
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <Badge variant="premium" glow className="mb-6">
-              We&apos;re hiring
-            </Badge>
-
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-6">
               Join the <GradientText>WikiBot</GradientText> Team
             </h1>
 
             <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
               Help us build the best knowledge management tool for Discord communities.
-              We&apos;re looking for passionate people who want to make a difference.
+              We&apos;re always looking for passionate people who want to make a difference.
             </p>
           </div>
         </section>

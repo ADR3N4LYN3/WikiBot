@@ -65,7 +65,7 @@ export default function AboutPage() {
               <h2 className="text-2xl sm:text-3xl font-bold mb-6">Our Story</h2>
               <div className="space-y-4 text-muted-foreground">
                 <p>
-                  In 2024, we noticed that Discord communities were struggling with a common problem:
+                  In 2026, we noticed that Discord communities were struggling with a common problem:
                   information was scattered across channels, FAQs were buried in pinned messages,
                   and moderators spent countless hours answering the same questions.
                 </p>
@@ -76,7 +76,7 @@ export default function AboutPage() {
                   members need most.
                 </p>
                 <p>
-                  Today, WikiBot serves thousands of Discord communities, from gaming servers
+                  WikiBot is designed for Discord communities of all sizes, from gaming servers
                   to developer communities, helping them share knowledge effortlessly.
                 </p>
               </div>
@@ -112,7 +112,7 @@ export default function AboutPage() {
               Ready to get started?
             </h2>
             <p className="text-muted-foreground mb-8">
-              Join thousands of Discord communities using WikiBot.
+              Join Discord communities using WikiBot to organize their knowledge.
             </p>
             <Link href="/invite">
               <GradientButton size="lg" className="group">
