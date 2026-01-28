@@ -3,7 +3,7 @@
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { BookOpen, Loader2, Sparkles } from 'lucide-react';
+import { ArrowLeft, BookOpen, Loader2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
 import { cn } from '@/lib/utils';
@@ -66,6 +66,27 @@ export default function LoginPage() {
           />
         </>
       )}
+
+      {/* Back button */}
+      <motion.div
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.1 }}
+      >
+        <Link
+          href="/"
+          className={cn(
+            'flex items-center gap-2 px-3 py-2 rounded-xl',
+            'text-sm text-muted-foreground',
+            'hover:text-foreground hover:bg-muted/50',
+            'transition-colors'
+          )}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back</span>
+        </Link>
+      </motion.div>
 
       {/* Content */}
       <motion.div
