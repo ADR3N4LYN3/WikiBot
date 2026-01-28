@@ -29,6 +29,19 @@ interface Release {
 
 const releases: Release[] = [
   {
+    version: '2.2.0',
+    date: '2025-01-28',
+    title: 'MEE6-Inspired UX Improvements',
+    changes: [
+      { type: 'feature', description: 'Quick Actions bar on dashboard for fast access to common tasks' },
+      { type: 'feature', description: 'Modules page with toggle switches to enable/disable features' },
+      { type: 'feature', description: 'Command Palette (Ctrl+K) for quick navigation and search' },
+      { type: 'feature', description: 'Onboarding wizard for new users with guided setup' },
+      { type: 'feature', description: 'Real-time stats on landing page from public API' },
+      { type: 'improvement', description: 'Global keyboard shortcuts throughout dashboard' },
+    ],
+  },
+  {
     version: '2.1.0',
     date: '2024-01-15',
     title: 'AI-Powered Search',

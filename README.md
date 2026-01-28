@@ -4,6 +4,7 @@ WikiBot is a Discord bot with a web dashboard for managing collaborative knowled
 
 ## Features
 
+### Core Features
 - 📚 **Knowledge Base Management** - Create, edit, and organize wiki articles
 - 🔍 **Smart Search** - Full-text search (free) and AI semantic search (premium)
 - 🤖 **AI Answers** - RAG-powered responses using GPT-4
@@ -11,6 +12,12 @@ WikiBot is a Discord bot with a web dashboard for managing collaborative knowled
 - 📊 **Analytics** - Track article views, searches, and engagement
 - 💎 **Freemium Model** - Free tier + Premium/Pro subscriptions
 - 🎨 **Custom Branding** - Customize colors, logos, and embeds (premium)
+
+### Dashboard UX (New!)
+- ⚡ **Quick Actions Bar** - Fast access to common actions from the dashboard
+- 🎛️ **Modules Page** - Enable/disable features with toggle switches (MEE6-style)
+- ⌨️ **Command Palette** - Press `Ctrl+K` for quick navigation and search
+- 🎉 **Onboarding Wizard** - Guided setup for new users (create first category & article)
 
 ## Tech Stack
 
