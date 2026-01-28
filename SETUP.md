@@ -175,9 +175,28 @@ Dans Cloudflare, ajoute ces records DNS pointant vers l'IP de ton VPS :
 | A | api | `IP_DE_TON_VPS` | DNS only (gris) |
 | A | www | `IP_DE_TON_VPS` | DNS only (gris) |
 
-**Important** : Laisse le proxy Cloudflare **désactivé** (icône grise) pour que Caddy gère le SSL.
+**Important** : Laisse le proxy Cloudflare **désactivé** (icône grise) pour que Let's Encrypt puisse valider les certificats.
 
-#### 2. Déployer sur le VPS
+#### 2. Configurer nginx
+
+Copie les configs nginx fournies :
+
+```bash
+sudo cp nginx/wikibot.conf /etc/nginx/sites-available/
+sudo cp nginx/wikibot-api.conf /etc/nginx/sites-available/
+sudo ln -s /etc/nginx/sites-available/wikibot.conf /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/wikibot-api.conf /etc/nginx/sites-enabled/
+```
+
+Génère les certificats SSL avec Let's Encrypt :
+
+```bash
+sudo apt install certbot python3-certbot-nginx -y
+sudo certbot --nginx -d wikibot-app.xyz -d api.wikibot-app.xyz -d www.wikibot-app.xyz
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+#### 3. Déployer sur le VPS
 
 ```bash
 # Connecte-toi au VPS
@@ -186,6 +205,10 @@ ssh user@ton-vps
 # Clone le repo
 git clone https://github.com/tonusername/WikiBot.git
 cd WikiBot
+
+# Installe pnpm et génère le lockfile
+npm install -g pnpm
+pnpm install
 
 # Crée le fichier .env avec tes variables
 nano .env
