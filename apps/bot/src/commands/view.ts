@@ -36,30 +36,39 @@ const command: Command = {
 
       const article = response.data;
 
+      // Safely extract article data with defaults
+      const content = article.content?.substring(0, 4000) || 'No content available';
+      const authorName = article.author?.username || 'Unknown';
+      const views = article.views ?? 0;
+      const helpful = article.helpful ?? 0;
+      const notHelpful = article.notHelpful ?? 0;
+      const totalVotes = helpful + notHelpful;
+      const updatedAt = article.updatedAt ? new Date(article.updatedAt).toLocaleDateString() : 'Unknown';
+
       // Create embed
       const embed = new EmbedBuilder()
         .setColor(DISCORD_COLORS.BLURPLE)
-        .setTitle(`${article.category?.emoji || '📄'} ${article.title}`)
-        .setDescription(article.content.substring(0, 4000)) // Discord embed limit
+        .setTitle(`${article.category?.emoji || '📄'} ${article.title || 'Untitled'}`)
+        .setDescription(content)
         .addFields(
           {
             name: '👤 Author',
-            value: article.author.username,
+            value: authorName,
             inline: true,
           },
           {
             name: '👀 Views',
-            value: article.views.toString(),
+            value: views.toString(),
             inline: true,
           },
           {
             name: '👍 Helpful',
-            value: `${article.helpful} / ${article.helpful + article.notHelpful}`,
+            value: totalVotes > 0 ? `${helpful} / ${totalVotes}` : 'No votes yet',
             inline: true,
           }
         )
         .setFooter({
-          text: `Last updated ${new Date(article.updatedAt).toLocaleDateString()}`,
+          text: `Last updated ${updatedAt}`,
         });
 
       if (article.category) {

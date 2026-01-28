@@ -66,9 +66,13 @@ const command: Command = {
 
       // Add top 5 results as fields
       for (const result of results.slice(0, 5)) {
+        const excerpt = result.excerpt?.substring(0, 100) || 'No preview available';
+        const views = result.views ?? 0;
+        const helpful = result.helpful ?? 0;
+
         embed.addFields({
-          name: `${result.categoryEmoji || '📄'} ${result.title}`,
-          value: `${result.excerpt.substring(0, 100)}...\n\`/view ${result.slug}\` • ${result.views} views • ${result.helpful} helpful`,
+          name: `${result.categoryEmoji || '📄'} ${result.title || 'Untitled'}`,
+          value: `${excerpt}${excerpt.length >= 100 ? '...' : ''}\n\`/view ${result.slug}\` • ${views} views • ${helpful} helpful`,
         });
       }
 

@@ -4,6 +4,16 @@ import { Client, GatewayIntentBits, Collection } from 'discord.js';
 import { Command } from './types';
 import { loadCommands } from './utils/loadCommands';
 
+// Validate required environment variables
+if (!process.env.DISCORD_BOT_TOKEN) {
+  console.error('❌ DISCORD_BOT_TOKEN is not set in environment variables');
+  process.exit(1);
+}
+
+if (!process.env.API_URL) {
+  console.warn('⚠️  API_URL not set, defaulting to http://localhost:4000');
+}
+
 // Create Discord client
 export const client = new Client({
   intents: [

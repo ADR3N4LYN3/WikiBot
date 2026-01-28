@@ -20,20 +20,35 @@ for (const file of commandFiles) {
   }
 }
 
+// Validate required environment variables
+const botToken = process.env.DISCORD_BOT_TOKEN;
+const clientId = process.env.DISCORD_CLIENT_ID;
+
+if (!botToken) {
+  console.error('❌ DISCORD_BOT_TOKEN is not set in environment variables');
+  process.exit(1);
+}
+
+if (!clientId) {
+  console.error('❌ DISCORD_CLIENT_ID is not set in environment variables');
+  process.exit(1);
+}
+
 // Register commands with Discord
-const rest = new REST().setToken(process.env.DISCORD_BOT_TOKEN!);
+const rest = new REST().setToken(botToken);
 
 (async () => {
   try {
     console.log(`🔄 Started refreshing ${commands.length} application (/) commands.`);
 
     const data = await rest.put(
-      Routes.applicationCommands(process.env.DISCORD_CLIENT_ID!),
+      Routes.applicationCommands(clientId),
       { body: commands }
     ) as RESTPostAPIChatInputApplicationCommandsJSONBody[];
 
     console.log(`✅ Successfully reloaded ${data.length} application (/) commands.`);
   } catch (error) {
     console.error('❌ Failed to register commands:', error);
+    process.exit(1);
   }
 })();

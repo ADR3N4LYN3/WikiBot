@@ -121,21 +121,30 @@ const command: Command = {
 
       await modalInteraction.editReply({ embeds: [embed] });
     } catch (error: unknown) {
+      // Modal timeout - silently ignore
+      if (error instanceof Error && error.name === 'InteractionCollectorError') {
+        return;
+      }
+
       console.error('Create article error:', error);
 
-      // Modal timeout or error
-      const err = error as { code?: string; response?: { data?: { message?: string } } };
-      if (err.code === 'InteractionCollectorError') {
-        // Modal timed out, ignore
-        return;
+      // Extract error message safely
+      let errorMessage = 'An error occurred while creating the article.';
+      if (error && typeof error === 'object') {
+        const axiosError = error as { response?: { data?: { message?: string }; status?: number } };
+        if (axiosError.response?.data?.message) {
+          errorMessage = axiosError.response.data.message;
+        } else if (axiosError.response?.status === 409) {
+          errorMessage = 'An article with this title already exists.';
+        } else if (axiosError.response?.status === 403) {
+          errorMessage = 'You do not have permission to create articles.';
+        }
       }
 
       const embed = new EmbedBuilder()
         .setColor(DISCORD_COLORS.RED)
         .setTitle('❌ Failed to Create Article')
-        .setDescription(
-          err.response?.data?.message || 'An error occurred while creating the article.'
-        );
+        .setDescription(errorMessage);
 
       try {
         await interaction.followUp({ embeds: [embed], ephemeral: true });
