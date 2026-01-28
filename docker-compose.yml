@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: wikibot-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: wikibot
+      POSTGRES_PASSWORD: wikibot_password
+      POSTGRES_DB: wikibot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wikibot"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis (for caching and rate limiting)
+  redis:
+    image: redis:7-alpine
+    container_name: wikibot-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # API Server
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: wikibot-api
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - DATABASE_URL=postgresql://wikibot:wikibot_password@postgres:5432/wikibot
+      - REDIS_URL=redis://redis:6379
+      - API_PORT=4000
+      - NEXTAUTH_URL=http://localhost:3000
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # Discord Bot
+  bot:
+    build:
+      context: .
+      dockerfile: apps/bot/Dockerfile
+    container_name: wikibot-bot
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://wikibot:wikibot_password@postgres:5432/wikibot
+      - API_URL=http://api:4000
+    env_file:
+      - .env
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+  redis_data:
