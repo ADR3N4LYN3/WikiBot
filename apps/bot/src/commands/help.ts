@@ -85,9 +85,7 @@ const command: Command = {
       new ButtonBuilder()
         .setLabel('Invite Bot')
         .setStyle(ButtonStyle.Link)
-        .setURL(
-          `https://discord.com/api/oauth2/authorize?client_id=${process.env.DISCORD_CLIENT_ID}&permissions=274878024704&scope=bot%20applications.commands`
-        )
+        .setURL(`${process.env.DASHBOARD_URL || 'https://wikibot-app.xyz'}/invite`)
         .setEmoji('➕')
     );
 
