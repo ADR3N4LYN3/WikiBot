@@ -70,6 +70,38 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
+// POST /api/v1/servers/check - Check which guild IDs have bot installed
+router.post('/check', async (req, res, next) => {
+  try {
+    const { guildIds } = req.body;
+
+    if (!Array.isArray(guildIds)) {
+      return res.status(400).json({
+        success: false,
+        error: 'guildIds must be an array',
+      });
+    }
+
+    const servers = await prisma.server.findMany({
+      where: {
+        id: {
+          in: guildIds,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    return res.json({
+      success: true,
+      serverIds: servers.map((s) => s.id),
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // DELETE /api/v1/servers/:id - Delete a server (when bot leaves)
 router.delete('/:id', async (req, res, next) => {
   try {

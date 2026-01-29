@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { prisma } from '@wikibot/database';
 
 interface DiscordGuild {
   id: string;
@@ -50,25 +49,28 @@ export async function GET() {
     // Get guild IDs where user has permission
     const guildIds = manageableGuilds.map((g) => g.id);
 
-    // Fetch servers from database that match these guild IDs (bot is installed there)
-    const installedServers = await prisma.server.findMany({
-      where: {
-        id: {
-          in: guildIds,
-        },
+    // Fetch servers from API that match these guild IDs (bot is installed there)
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+    const apiResponse = await fetch(`${apiUrl}/api/v1/servers/check`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      select: {
-        id: true,
-        name: true,
-      },
+      body: JSON.stringify({ guildIds }),
     });
 
-    // Create a set of installed server IDs for quick lookup
-    const installedServerIds = new Set(installedServers.map((s) => s.id));
+    let installedServerIds: string[] = [];
+    if (apiResponse.ok) {
+      const data = await apiResponse.json();
+      installedServerIds = data.serverIds || [];
+    }
+
+    // Create a set for quick lookup
+    const installedSet = new Set(installedServerIds);
 
     // Combine Discord data with our database
     const servers = manageableGuilds
-      .filter((guild) => installedServerIds.has(guild.id))
+      .filter((guild) => installedSet.has(guild.id))
       .map((guild) => ({
         id: guild.id,
         name: guild.name,
