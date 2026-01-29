@@ -24,15 +24,20 @@ apps/bot/src/
 │   ├── wiki-search.ts    # Recherche d'articles
 │   ├── wiki-view.ts      # Affichage d'article
 │   ├── wiki-create.ts    # Création d'article
+│   ├── wiki-list.ts      # Liste des articles
+│   ├── wiki-category.ts  # Gestion des catégories
+│   ├── wiki-stats.ts     # Statistiques du serveur
 │   └── wiki-help.ts      # Aide
 ├── events/               # Gestionnaires d'événements
 │   ├── ready.ts          # Startup, sync serveurs
-│   ├── interactionCreate.ts  # Commandes + boutons
-│   └── guildCreate.ts    # Nouveau serveur
+│   ├── interactionCreate.ts  # Commandes + boutons + autocomplete
+│   ├── guildCreate.ts    # Nouveau serveur
+│   └── guildDelete.ts    # Serveur quitté (cleanup)
 ├── services/
 │   └── apiClient.ts      # Client HTTP vers l'API
 └── utils/
-    └── loadCommands.ts   # Chargement dynamique
+    ├── loadCommands.ts   # Chargement dynamique
+    └── embeds.ts         # Utilities pour embeds Discord
 ```
 
 ### Flux de données
@@ -53,7 +58,10 @@ Discord User → Bot (discord.js)
 |----------|-------------|-------------------|
 | `/wiki-search <query>` | Recherche dans la base de connaissances | Aucune |
 | `/wiki-view <slug>` | Affiche un article complet | Aucune |
+| `/wiki-list [category]` | Liste tous les articles | Aucune |
 | `/wiki-create` | Crée un nouvel article (modal) | `Manage Messages` |
+| `/wiki-category <action>` | Gère les catégories (create/list/delete) | `Manage Server` |
+| `/wiki-stats` | Affiche les statistiques du serveur | Aucune |
 | `/wiki-help` | Affiche l'aide et les liens | Aucune |
 
 ### wiki-search
@@ -78,6 +86,19 @@ Affiche le contenu complet d'un article avec boutons de feedback.
 - Boutons "Helpful" / "Not Helpful"
 - Incrémentation automatique des vues
 
+### wiki-list
+
+Liste tous les articles du serveur avec pagination.
+
+**Options**:
+- `category` (optionnel): Filtrer par catégorie (autocomplete)
+
+**Fonctionnalités**:
+- Affichage de 10 articles par page
+- Filtrage par catégorie avec autocomplete
+- Boutons Previous/Next pour navigation
+- Affichage des vues par article
+
 ### wiki-create
 
 Ouvre un modal pour créer un article.
@@ -89,6 +110,38 @@ Ouvre un modal pour créer un article.
 
 **Timeout**: 5 minutes pour soumettre le modal.
 
+### wiki-category
+
+Gère les catégories du serveur (sous-commandes).
+
+**Permission requise**: `MANAGE_GUILD`
+
+**Sous-commandes**:
+
+| Sous-commande | Description | Options |
+|---------------|-------------|---------|
+| `create` | Créer une catégorie | `name` (requis), `slug`, `description`, `emoji` |
+| `list` | Lister les catégories | - |
+| `delete` | Supprimer une catégorie | `slug` (requis, autocomplete) |
+
+**Fonctionnalités**:
+- Génération automatique du slug si non fourni
+- Autocomplete sur delete pour faciliter la sélection
+- Affichage du nombre d'articles par catégorie
+- Les articles orphelins deviennent "non catégorisés"
+
+### wiki-stats
+
+Affiche les statistiques du serveur.
+
+**Données affichées**:
+- Nombre d'articles publiés
+- Nombre de catégories
+- Total des vues
+- Nombre de recherches (30 derniers jours)
+
+**Authentification**: Utilise le `BOT_API_SECRET` pour accéder à l'endpoint `/api/v1/stats/server/:serverId`.
+
 ---
 
 ## Système de permissions
@@ -98,8 +151,11 @@ Ouvre un modal pour créer un article.
 | Action | Permission Discord |
 |--------|-------------------|
 | Créer un article | `MANAGE_MESSAGES` |
+| Gérer les catégories | `MANAGE_GUILD` |
 | Rechercher | Aucune |
 | Voir un article | Aucune |
+| Lister les articles | Aucune |
+| Voir les statistiques | Aucune |
 | Voter (feedback) | Aucune |
 
 ### Authentification Bot → API
@@ -176,6 +232,29 @@ if (!process.env.BOT_API_SECRET) {
 
 ## Fonctionnalités avancées
 
+### Autocomplete
+
+Plusieurs commandes supportent l'autocomplete Discord pour faciliter la saisie:
+
+| Commande | Option | Source des suggestions |
+|----------|--------|------------------------|
+| `/wiki-view` | `slug` | Articles du serveur |
+| `/wiki-list` | `category` | Catégories du serveur |
+| `/wiki-category delete` | `slug` | Catégories du serveur |
+
+**Implémentation**:
+
+```ts
+// types.ts
+interface Command {
+  data: SlashCommandBuilder;
+  execute: (interaction: ChatInputCommandInteraction) => Promise<void>;
+  autocomplete?: (interaction: AutocompleteInteraction) => Promise<void>;
+}
+```
+
+**Cache**: Les suggestions sont mises en cache pendant 60 secondes pour optimiser les performances.
+
 ### Auto-reconnexion
 
 Le bot gère les déconnexions avec backoff exponentiel:
@@ -208,6 +287,18 @@ Le bot affiche un statut qui change toutes les 30 secondes:
 ---
 
 ## Changelog
+
+### v0.3.0 (2025-01-29)
+
+- **Nouvelles commandes**:
+  - `/wiki-list` - Liste des articles avec pagination et filtrage par catégorie
+  - `/wiki-category` - Gestion complète des catégories (create/list/delete)
+  - `/wiki-stats` - Statistiques du serveur (articles, vues, recherches)
+- **Autocomplete**: Support sur `/wiki-view`, `/wiki-list` et `/wiki-category delete`
+- **Pagination**: Boutons Previous/Next sur `/wiki-search` et `/wiki-list`
+- **Event guildDelete**: Nettoyage automatique quand le bot quitte un serveur
+- **Utilities**: Nouveau module `utils/embeds.ts` pour embeds standardisés
+- **Documentation**: Mise à jour de `/wiki-help` avec toutes les commandes
 
 ### v0.2.0 (2025-01-29)
 

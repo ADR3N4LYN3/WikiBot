@@ -8,6 +8,10 @@ Documentation des fonctionnalités du dashboard WikiBot.
 - [Page Modules](#page-modules)
 - [Command Palette](#command-palette)
 - [Onboarding Wizard](#onboarding-wizard)
+- [Composants UI](#composants-ui)
+- [API Publique](#api-publique)
+- [API Client](#api-client)
+- [Design System](#design-system)
 
 ---
 
@@ -188,6 +192,119 @@ import { OnboardingWizard } from '@/components/onboarding';
 
 ---
 
+## Composants UI
+
+### Skeleton Loaders
+
+**Localisation**: `components/ui/Skeleton.tsx`
+
+Composants de chargement pour améliorer le perceived performance.
+
+```tsx
+import { Skeleton, SkeletonArticleRow, SkeletonTable } from '@/components/ui/Skeleton';
+
+// Skeleton générique
+<Skeleton className="h-4 w-32" />
+
+// Table d'articles avec skeleton
+<SkeletonTable rows={5} />
+```
+
+### Empty States
+
+**Localisation**: `components/ui/EmptyState.tsx`
+
+États vides illustrés avec call-to-action.
+
+| Composant | Usage |
+|-----------|-------|
+| `EmptyArticles` | Liste d'articles vide |
+| `EmptyCategories` | Aucune catégorie |
+| `EmptySearchResults` | Recherche sans résultats |
+| `EmptyAnalytics` | Pas encore de données |
+
+```tsx
+import { EmptyArticles } from '@/components/ui/EmptyState';
+
+{articles.length === 0 && <EmptyArticles />}
+```
+
+### Confirm Dialog
+
+**Localisation**: `components/ui/ConfirmDialog.tsx`
+
+Modal de confirmation avec hook pour gestion d'état.
+
+```tsx
+import { ConfirmDialog, useConfirmDialog } from '@/components/ui/ConfirmDialog';
+
+function MyComponent() {
+  const { isOpen, isLoading, open, close, confirm } = useConfirmDialog({
+    onConfirm: async () => {
+      await deleteItem();
+    },
+  });
+
+  return (
+    <>
+      <button onClick={open}>Delete</button>
+      <ConfirmDialog
+        isOpen={isOpen}
+        onClose={close}
+        onConfirm={confirm}
+        isLoading={isLoading}
+        title="Delete Item"
+        description="Are you sure?"
+        variant="danger"
+      />
+    </>
+  );
+}
+```
+
+### Pagination
+
+**Localisation**: `components/ui/Pagination.tsx`
+
+Composant de pagination avec info sur les résultats.
+
+```tsx
+import { Pagination, PaginationInfo } from '@/components/ui/Pagination';
+
+<PaginationInfo
+  currentPage={page}
+  totalPages={totalPages}
+  totalItems={total}
+  itemsPerPage={limit}
+/>
+
+<Pagination
+  currentPage={page}
+  totalPages={totalPages}
+  onPageChange={setPage}
+/>
+```
+
+### Breadcrumbs
+
+**Localisation**: `components/ui/Breadcrumbs.tsx`
+
+Navigation fil d'Ariane.
+
+```tsx
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+
+<Breadcrumbs
+  items={[
+    { label: 'Dashboard', href: '/dashboard' },
+    { label: 'Articles', href: '/dashboard/articles' },
+    { label: 'Edit Article' },
+  ]}
+/>
+```
+
+---
+
 ## API Publique
 
 ### GET /api/public/stats
@@ -309,6 +426,25 @@ Les composants utilisent le design system glassmorphic du projet:
 ---
 
 ## Changelog
+
+### v0.3.0 (2025-01-29)
+
+- **Composants UI**:
+  - `Skeleton` - Loaders squelettes pour chargement (`SkeletonArticleRow`, `SkeletonTable`)
+  - `EmptyState` - États vides illustrés (`EmptyArticles`, `EmptyCategories`, `EmptySearchResults`)
+  - `ConfirmDialog` - Modals de confirmation avec hook `useConfirmDialog`
+  - `Breadcrumbs` - Navigation fil d'Ariane
+  - `Pagination` - Composant pagination réutilisable
+- **Page Articles**:
+  - Pagination côté serveur avec `page` et `limit` params
+  - Skeletons pendant le chargement des données
+  - Dialogs de confirmation avant suppression
+- **Landing Page**:
+  - Section `Testimonials` avec avis utilisateurs animés
+  - Animations Framer Motion améliorées sur le hero
+- **API Client**:
+  - Support pagination (`articlesApi.getAll({ page, limit })`)
+  - Authentification JWT automatique via NextAuth session
 
 ### v0.2.1 (2025-01-29)
 
