@@ -158,7 +158,7 @@ export function Header({ user }: HeaderProps) {
                   </Link>
 
                   <Link
-                    href="/dashboard/settings"
+                    href="/dashboard/profile"
                     onClick={() => setMenuOpen(false)}
                     className={cn(
                       'w-full flex items-center gap-3 px-4 py-2.5',
