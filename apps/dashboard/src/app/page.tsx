@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { Navbar } from '@/components/marketing/Navbar';
 import { Hero } from '@/components/marketing/Hero';
+import { Preview } from '@/components/marketing/Preview';
 import { Features } from '@/components/marketing/Features';
 import { Pricing } from '@/components/marketing/Pricing';
 import { FAQ } from '@/components/marketing/FAQ';
@@ -21,6 +22,7 @@ export default async function HomePage() {
     <main className="min-h-screen">
       <Navbar />
       <Hero />
+      <Preview />
       <Features />
       <Pricing />
       <FAQ />
