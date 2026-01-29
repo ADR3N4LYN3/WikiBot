@@ -40,8 +40,8 @@ async function registerCommands() {
 
 // Rotating status messages
 const statusMessages = [
-  { name: '/help', type: ActivityType.Listening },
-  { name: '/search your questions', type: ActivityType.Listening },
+  { name: '/wiki-help', type: ActivityType.Listening },
+  { name: '/wiki-search your questions', type: ActivityType.Listening },
   { name: '{servers} servers', type: ActivityType.Watching },
   { name: '{articles} articles', type: ActivityType.Watching },
   { name: 'your knowledge base', type: ActivityType.Competing },
@@ -66,21 +66,22 @@ async function syncServers() {
   console.log('🔄 Syncing servers to database...');
 
   const guilds = client.guilds.cache;
-  let synced = 0;
-  let failed = 0;
 
-  for (const [, guild] of guilds) {
-    try {
-      await apiClient.post('/api/v1/servers', {
+  const results = await Promise.allSettled(
+    Array.from(guilds.values()).map(guild =>
+      apiClient.post('/api/v1/servers', {
         id: guild.id,
         name: guild.name,
-      });
-      synced++;
-    } catch (error) {
-      console.error(`❌ Failed to sync server ${guild.name}:`, error);
-      failed++;
-    }
-  }
+      }).then(() => ({ success: true, name: guild.name }))
+        .catch(error => {
+          console.error(`❌ Failed to sync server ${guild.name}:`, error);
+          return { success: false, name: guild.name };
+        })
+    )
+  );
+
+  const synced = results.filter(r => r.status === 'fulfilled' && r.value.success).length;
+  const failed = results.length - synced;
 
   console.log(`✅ Server sync complete: ${synced} synced, ${failed} failed`);
 }

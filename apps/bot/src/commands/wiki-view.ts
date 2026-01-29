@@ -1,4 +1,5 @@
 import { DISCORD_COLORS } from '@wikibot/shared';
+import axios from 'axios';
 import { SlashCommandBuilder, ChatInputCommandInteraction, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 
 import { apiClient } from '../services/apiClient';
@@ -107,12 +108,12 @@ const command: Command = {
     } catch (error: unknown) {
       console.error('View article error:', error);
 
-      const err = error as { response?: { status?: number } };
+      const is404 = axios.isAxiosError(error) && error.response?.status === 404;
       const embed = new EmbedBuilder()
         .setColor(DISCORD_COLORS.RED)
         .setTitle('❌ Article Not Found')
         .setDescription(
-          err.response?.status === 404
+          is404
             ? `No article found with slug "${slug}"`
             : 'An error occurred while fetching the article.'
         );

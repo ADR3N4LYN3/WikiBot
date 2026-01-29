@@ -14,6 +14,10 @@ if (!process.env.API_URL) {
   console.warn('⚠️  API_URL not set, defaulting to http://localhost:4000');
 }
 
+if (!process.env.BOT_API_SECRET) {
+  console.warn('⚠️  BOT_API_SECRET not set, API requests will be unauthenticated');
+}
+
 // Create Discord client
 export const client = new Client({
   intents: [

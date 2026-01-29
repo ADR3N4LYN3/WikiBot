@@ -1,4 +1,5 @@
 import { DISCORD_COLORS } from '@wikibot/shared';
+import axios from 'axios';
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
@@ -8,6 +9,7 @@ import {
   ActionRowBuilder,
   EmbedBuilder,
   ModalSubmitInteraction,
+  PermissionFlagsBits,
 } from 'discord.js';
 
 import { apiClient } from '../services/apiClient';
@@ -19,6 +21,17 @@ const command: Command = {
     .setDescription('Create a new article in the knowledge base'),
 
   async execute(interaction: ChatInputCommandInteraction) {
+    // Check if user has permission to create articles (MANAGE_MESSAGES or ADMINISTRATOR)
+    if (!interaction.memberPermissions?.has(PermissionFlagsBits.ManageMessages)) {
+      const embed = new EmbedBuilder()
+        .setColor(DISCORD_COLORS.RED)
+        .setTitle('❌ Permission Denied')
+        .setDescription('You need the **Manage Messages** permission to create articles.');
+
+      await interaction.reply({ embeds: [embed], ephemeral: true });
+      return;
+    }
+
     // Create modal for article input
     const modal = new ModalBuilder()
       .setCustomId('wiki-create-article-modal')
@@ -130,13 +143,12 @@ const command: Command = {
 
       // Extract error message safely
       let errorMessage = 'An error occurred while creating the article.';
-      if (error && typeof error === 'object') {
-        const axiosError = error as { response?: { data?: { message?: string }; status?: number } };
-        if (axiosError.response?.data?.message) {
-          errorMessage = axiosError.response.data.message;
-        } else if (axiosError.response?.status === 409) {
+      if (axios.isAxiosError(error) && error.response) {
+        if (error.response.data?.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.status === 409) {
           errorMessage = 'An article with this title already exists.';
-        } else if (axiosError.response?.status === 403) {
+        } else if (error.response.status === 403) {
           errorMessage = 'You do not have permission to create articles.';
         }
       }
