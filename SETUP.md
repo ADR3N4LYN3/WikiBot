@@ -325,6 +325,7 @@ WikiBot/
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | `/api/v1/servers` | Créer/mettre à jour un serveur |
+| POST | `/api/v1/servers/check` | Vérifier quels serveurs ont le bot installé |
 | GET | `/api/v1/servers/:id` | Récupérer un serveur |
 | DELETE | `/api/v1/servers/:id` | Supprimer un serveur |
 
