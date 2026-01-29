@@ -210,6 +210,84 @@ const { data } = useSWR('/api/public/stats', fetcher);
 
 ---
 
+## API Client
+
+**Localisation**: `lib/api.ts`
+
+Le client API centralise toutes les requêtes vers le backend.
+
+### Configuration
+
+```ts
+import axios from 'axios';
+import { getSession } from 'next-auth/react';
+
+export const api = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+```
+
+### Authentification automatique
+
+L'intercepteur de requêtes ajoute automatiquement :
+
+1. **X-Server-Id** : ID du serveur Discord sélectionné (depuis localStorage)
+2. **Authorization** : Token Bearer de la session NextAuth
+
+```ts
+api.interceptors.request.use(async (config) => {
+  // Server ID
+  const serverId = localStorage.getItem('selectedServerId');
+  if (serverId) {
+    config.headers['X-Server-Id'] = serverId;
+  }
+
+  // Auth token
+  const session = await getSession();
+  if (session?.accessToken) {
+    config.headers['Authorization'] = `Bearer ${session.accessToken}`;
+  }
+
+  return config;
+});
+```
+
+### Services disponibles
+
+| Service | Endpoints | Description |
+|---------|-----------|-------------|
+| `articlesApi` | GET, POST, PUT, DELETE `/api/v1/articles` | Gestion des articles |
+| `categoriesApi` | GET, POST, PUT, DELETE `/api/v1/categories` | Gestion des catégories |
+| `analyticsApi` | GET `/api/v1/analytics/*` | Statistiques |
+| `searchApi` | GET `/api/v1/search` | Recherche |
+| `settingsApi` | GET, PUT `/api/v1/settings` | Configuration |
+| `subscriptionsApi` | GET, POST `/api/v1/subscriptions/*` | Abonnements |
+| `exportApi` | GET, POST `/api/v1/export/*` | Import/Export |
+
+### Exemple d'utilisation
+
+```tsx
+import { categoriesApi } from '@/lib/api';
+
+// Dans un composant avec useSWR
+const { data: categories, mutate } = useSWR('categories', () =>
+  categoriesApi.getAll().then((res) => res.data)
+);
+
+// Créer une catégorie
+await categoriesApi.create({
+  name: 'Getting Started',
+  slug: 'getting-started',
+  emoji: '🚀',
+});
+mutate(); // Refresh data
+```
+
+---
+
 ## Design System
 
 Les composants utilisent le design system glassmorphic du projet:
@@ -231,6 +309,12 @@ Les composants utilisent le design system glassmorphic du projet:
 ---
 
 ## Changelog
+
+### v0.2.1 (2025-01-29)
+
+- Fix responsive mobile sur toutes les pages dashboard
+- Fix authentification API (ajout header Authorization Bearer)
+- Documentation API client
 
 ### v0.2.0 (2025-01-28)
 
