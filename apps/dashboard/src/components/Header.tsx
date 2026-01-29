@@ -1,8 +1,9 @@
 'use client';
 
 import Image from 'next/image';
+import Link from 'next/link';
 import { signOut } from 'next-auth/react';
-import { LogOut, ChevronDown, Settings, User as UserIcon, Menu } from 'lucide-react';
+import { LogOut, ChevronDown, Settings, User as UserIcon, Menu, Home } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -142,10 +143,23 @@ export function Header({ user }: HeaderProps) {
 
                 {/* Menu items */}
                 <div className="py-1">
-                  <button
-                    onClick={() => {
-                      setMenuOpen(false);
-                    }}
+                  <Link
+                    href="/"
+                    onClick={() => setMenuOpen(false)}
+                    className={cn(
+                      'w-full flex items-center gap-3 px-4 py-2.5',
+                      'text-sm text-muted-foreground',
+                      'hover:bg-muted/50 hover:text-foreground',
+                      'transition-colors duration-200'
+                    )}
+                  >
+                    <Home className="w-4 h-4" />
+                    Back to Home
+                  </Link>
+
+                  <Link
+                    href="/dashboard/settings"
+                    onClick={() => setMenuOpen(false)}
                     className={cn(
                       'w-full flex items-center gap-3 px-4 py-2.5',
                       'text-sm text-muted-foreground',
@@ -155,12 +169,11 @@ export function Header({ user }: HeaderProps) {
                   >
                     <UserIcon className="w-4 h-4" />
                     Profile
-                  </button>
+                  </Link>
 
-                  <button
-                    onClick={() => {
-                      setMenuOpen(false);
-                    }}
+                  <Link
+                    href="/dashboard/settings"
+                    onClick={() => setMenuOpen(false)}
                     className={cn(
                       'w-full flex items-center gap-3 px-4 py-2.5',
                       'text-sm text-muted-foreground',
@@ -170,7 +183,7 @@ export function Header({ user }: HeaderProps) {
                   >
                     <Settings className="w-4 h-4" />
                     Settings
-                  </button>
+                  </Link>
                 </div>
 
                 {/* Sign out */}
