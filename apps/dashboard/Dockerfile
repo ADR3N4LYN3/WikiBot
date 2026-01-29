@@ -20,6 +20,11 @@ RUN pnpm --filter @wikibot/database prisma generate
 # Build the dashboard
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV DOCKER_BUILD=true
+
+# NEXT_PUBLIC_* variables must be available at build time
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 RUN pnpm --filter @wikibot/dashboard build
 
 # Production stage

@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: apps/dashboard/Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=https://api.wikibot-app.xyz
     container_name: wikibot-dashboard
     restart: unless-stopped
     ports:
