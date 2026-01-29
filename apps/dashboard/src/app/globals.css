@@ -249,3 +249,52 @@
 .dark .noise-overlay::before {
   opacity: 0.05;
 }
+
+/* Floating orb animations - CSS-based for better performance */
+@keyframes float-orb-1 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(15px, -10px);
+  }
+}
+
+@keyframes float-orb-2 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-15px, 15px);
+  }
+}
+
+@keyframes float-orb-3 {
+  0%, 100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(10px, 20px);
+  }
+}
+
+.animate-float-orb-1 {
+  animation: float-orb-1 20s ease-in-out infinite;
+}
+
+.animate-float-orb-2 {
+  animation: float-orb-2 25s ease-in-out infinite;
+}
+
+.animate-float-orb-3 {
+  animation: float-orb-3 30s ease-in-out infinite;
+}
+
+/* Disable animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-orb-1,
+  .animate-float-orb-2,
+  .animate-float-orb-3 {
+    animation: none;
+  }
+}

@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Sparkles, ArrowRight, Users, BookOpen, Search } from 'lucide-react';
 import useSWR from 'swr';
 
@@ -31,8 +31,6 @@ interface PublicStats {
 }
 
 export function Hero() {
-  const prefersReducedMotion = useReducedMotion();
-
   // Fetch live stats from API
   const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
   const { data: liveStats } = useSWR<PublicStats>(
@@ -59,56 +57,21 @@ export function Hero() {
     },
   ];
 
-  // Simplified animations for reduced motion - optimized for performance
-  // Slower animations + smaller movements = less GPU work
-  const orbAnimation = prefersReducedMotion
-    ? {}
-    : {
-        animate: {
-          x: [0, 15, 0],
-          y: [0, -10, 0],
-        },
-        transition: { duration: 20, repeat: Infinity, ease: 'linear' as const },
-      };
-
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
       {/* Background effects */}
       <div className="absolute inset-0 hero-pattern" />
       <div className="absolute inset-0 noise-overlay" />
 
-      {/* Floating orbs - optimized for performance */}
-      {/* Smaller sizes, reduced blur, slower animations, GPU-accelerated */}
-      <motion.div
-        className="hidden md:block absolute top-1/4 left-1/4 w-48 lg:w-64 h-48 lg:h-64 rounded-full bg-primary/15 blur-2xl will-change-transform"
-        style={{ transform: 'translateZ(0)' }}
-        {...orbAnimation}
+      {/* Floating orbs - CSS animations for better performance (no JS recalculations) */}
+      <div
+        className="hidden md:block absolute top-1/4 left-1/4 w-48 lg:w-64 h-48 lg:h-64 rounded-full bg-primary/15 blur-2xl animate-float-orb-1"
       />
-      <motion.div
-        className="hidden md:block absolute bottom-1/4 right-1/4 w-56 lg:w-72 h-56 lg:h-72 rounded-full bg-secondary/15 blur-2xl will-change-transform"
-        style={{ transform: 'translateZ(0)' }}
-        animate={
-          prefersReducedMotion
-            ? undefined
-            : {
-                x: [0, -15, 0],
-                y: [0, 15, 0],
-              }
-        }
-        transition={{ duration: 25, repeat: Infinity, ease: 'linear' as const }}
+      <div
+        className="hidden md:block absolute bottom-1/4 right-1/4 w-56 lg:w-72 h-56 lg:h-72 rounded-full bg-secondary/15 blur-2xl animate-float-orb-2"
       />
-      <motion.div
-        className="hidden lg:block absolute top-1/2 right-1/3 w-40 lg:w-48 h-40 lg:h-48 rounded-full bg-accent/15 blur-xl will-change-transform"
-        style={{ transform: 'translateZ(0)' }}
-        animate={
-          prefersReducedMotion
-            ? undefined
-            : {
-                x: [0, 10, 0],
-                y: [0, 20, 0],
-              }
-        }
-        transition={{ duration: 30, repeat: Infinity, ease: 'linear' as const }}
+      <div
+        className="hidden lg:block absolute top-1/2 right-1/3 w-40 lg:w-48 h-40 lg:h-48 rounded-full bg-accent/15 blur-xl animate-float-orb-3"
       />
 
       {/* Content */}
