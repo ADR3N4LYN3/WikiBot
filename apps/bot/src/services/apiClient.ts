@@ -10,10 +10,8 @@ export const apiClient = axios.create({
 
 // Add authorization header for bot-to-API authentication
 apiClient.interceptors.request.use(config => {
-  const botToken = process.env.BOT_API_SECRET;
-  if (botToken) {
-    config.headers['X-Bot-Token'] = botToken;
-  }
+  // Always send bot token header (use secret if configured, otherwise 'bot')
+  config.headers['X-Bot-Token'] = process.env.BOT_API_SECRET || 'bot';
   return config;
 });
 

@@ -6,10 +6,31 @@ import { AppError } from './errorHandler';
 export interface AuthenticatedRequest extends Request {
   serverId: string;
   userId?: string;
+  isBot?: boolean;
 }
 
-// Simple auth middleware - In production, verify JWT from NextAuth
+// Check if request is from the bot
+function isBotRequest(req: Request): boolean {
+  const botToken = req.headers['x-bot-token'] as string;
+  const expectedToken = process.env.BOT_API_SECRET;
+
+  // If no secret is configured, allow bot requests (dev mode)
+  if (!expectedToken) {
+    return !!botToken;
+  }
+
+  return botToken === expectedToken;
+}
+
+// Simple auth middleware - accepts both user JWT and bot token
 export function requireAuth(req: Request, _res: Response, next: NextFunction) {
+  // Check for bot token first
+  if (isBotRequest(req)) {
+    (req as AuthenticatedRequest).isBot = true;
+    return next();
+  }
+
+  // Check for user Bearer token
   const authHeader = req.headers.authorization;
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
