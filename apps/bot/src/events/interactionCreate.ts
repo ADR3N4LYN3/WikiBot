@@ -3,6 +3,23 @@ import { Events } from 'discord.js';
 import { client } from '../index';
 import { apiClient } from '../services/apiClient';
 
+// Handle autocomplete interactions
+client.on(Events.InteractionCreate, async interaction => {
+  if (!interaction.isAutocomplete()) return;
+
+  const command = client.commands.get(interaction.commandName);
+
+  if (!command || !command.autocomplete) {
+    return;
+  }
+
+  try {
+    await command.autocomplete(interaction);
+  } catch (error) {
+    console.error(`❌ Autocomplete error for ${interaction.commandName}:`, error);
+  }
+});
+
 // Handle slash commands
 client.on(Events.InteractionCreate, async interaction => {
   if (!interaction.isChatInputCommand()) return;

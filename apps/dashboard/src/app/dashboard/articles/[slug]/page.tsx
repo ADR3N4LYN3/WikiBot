@@ -8,6 +8,7 @@ import Link from 'next/link';
 import toast from 'react-hot-toast';
 
 import { ArticleEditor } from '@/components/ArticleEditor';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { articlesApi, categoriesApi } from '@/lib/api';
 import type { Category, ApiError } from '@/lib/types';
 
@@ -78,6 +79,14 @@ export default function EditArticlePage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      <Breadcrumbs
+        items={[
+          { label: 'Articles', href: '/dashboard/articles' },
+          { label: article?.title || 'Edit Article' },
+        ]}
+        className="mb-4"
+      />
+
       <div className="flex items-center gap-4">
         <Link
           href="/dashboard/articles"

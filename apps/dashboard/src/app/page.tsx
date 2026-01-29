@@ -5,6 +5,7 @@ import { Navbar } from '@/components/marketing/Navbar';
 import { Hero } from '@/components/marketing/Hero';
 import { Preview } from '@/components/marketing/Preview';
 import { Features } from '@/components/marketing/Features';
+import { Testimonials } from '@/components/marketing/Testimonials';
 import { Pricing } from '@/components/marketing/Pricing';
 import { FAQ } from '@/components/marketing/FAQ';
 import { Footer } from '@/components/marketing/Footer';
@@ -24,6 +25,7 @@ export default async function HomePage() {
       <Hero />
       <Preview />
       <Features />
+      <Testimonials />
       <Pricing />
       <FAQ />
       <Footer />

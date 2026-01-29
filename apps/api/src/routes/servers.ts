@@ -1,5 +1,5 @@
-import { Router } from 'express';
 import { prisma } from '@wikibot/database';
+import { Router } from 'express';
 
 const router = Router();
 

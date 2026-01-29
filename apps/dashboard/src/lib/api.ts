@@ -35,7 +35,7 @@ api.interceptors.response.use(
 
 // API functions
 export const articlesApi = {
-  getAll: (params?: { categoryId?: string; published?: boolean }) =>
+  getAll: (params?: { categoryId?: string; published?: boolean; page?: number; limit?: number }) =>
     api.get('/api/v1/articles', { params }),
   getBySlug: (slug: string) => api.get(`/api/v1/articles/${slug}`),
   create: (data: { title: string; content: string; categorySlug?: string }) =>

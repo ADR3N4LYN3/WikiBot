@@ -50,14 +50,15 @@ const statusMessages = [
 let currentStatusIndex = 0;
 let totalArticles = 0;
 
-// Update article count periodically
+// Update article count periodically from the stats API
 async function updateArticleCount() {
   try {
-    // This would ideally come from the API, but we'll use a placeholder
-    // TODO: Fetch from API when endpoint is available
-    totalArticles = 0;
-  } catch {
-    // Ignore errors
+    const response = await apiClient.get('/api/v1/stats');
+    totalArticles = response.data.articles || 0;
+    console.log(`📊 Updated stats: ${totalArticles} articles`);
+  } catch (error) {
+    // Log but don't fail - stats are optional
+    console.warn('⚠️  Failed to fetch stats:', error instanceof Error ? error.message : 'Unknown error');
   }
 }
 

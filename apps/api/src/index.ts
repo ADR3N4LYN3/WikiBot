@@ -14,6 +14,7 @@ import { publicRouter } from './routes/public';
 import { searchRouter } from './routes/search';
 import { serversRouter } from './routes/servers';
 import { settingsRouter } from './routes/settings';
+import { statsRouter } from './routes/stats';
 import { subscriptionsRouter } from './routes/subscriptions';
 import { webhooksRouter } from './routes/webhooks';
 
@@ -67,6 +68,7 @@ app.use('/api/v1/subscriptions', subscriptionsRouter);
 app.use('/api/v1/export', exportRouter);
 app.use('/api/v1/servers', serversRouter);
 app.use('/api/v1/settings', settingsRouter);
+app.use('/api/v1/stats', statsRouter);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);
