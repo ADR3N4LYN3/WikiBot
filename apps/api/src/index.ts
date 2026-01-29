@@ -22,10 +22,29 @@ const PORT = process.env.API_PORT || 4000;
 
 // Security middleware
 app.use(helmet());
+
+// CORS configuration
+const allowedOrigins = [
+  process.env.NEXTAUTH_URL || 'http://localhost:3000',
+  process.env.DASHBOARD_URL,
+].filter(Boolean) as string[];
+
 app.use(cors({
-  origin: process.env.NEXTAUTH_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
 }));
+
+// Allow public endpoints from any origin (for landing page stats)
+app.use('/api/public', cors());
 
 // Webhooks must be registered BEFORE body parsing (needs raw body for signature verification)
 app.use('/api/v1/webhooks', webhooksRouter);
