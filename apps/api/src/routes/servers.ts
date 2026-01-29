@@ -27,9 +27,46 @@ router.post('/', async (req, res, next) => {
       },
     });
 
+    console.log(`✅ Server synced: ${name} (${id})`);
+
     return res.status(201).json({
       success: true,
       server,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// POST /api/v1/servers/check - Check which guild IDs have bot installed
+// IMPORTANT: Must be before /:id to avoid route conflicts
+router.post('/check', async (req, res, next) => {
+  try {
+    const { guildIds } = req.body;
+
+    if (!Array.isArray(guildIds)) {
+      return res.status(400).json({
+        success: false,
+        error: 'guildIds must be an array',
+      });
+    }
+
+    const servers = await prisma.server.findMany({
+      where: {
+        id: {
+          in: guildIds,
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+
+    console.log(`🔍 Server check: ${guildIds.length} requested, ${servers.length} found`);
+
+    return res.json({
+      success: true,
+      serverIds: servers.map((s) => s.id),
     });
   } catch (error) {
     next(error);
@@ -64,38 +101,6 @@ router.get('/:id', async (req, res, next) => {
     return res.json({
       success: true,
       server,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// POST /api/v1/servers/check - Check which guild IDs have bot installed
-router.post('/check', async (req, res, next) => {
-  try {
-    const { guildIds } = req.body;
-
-    if (!Array.isArray(guildIds)) {
-      return res.status(400).json({
-        success: false,
-        error: 'guildIds must be an array',
-      });
-    }
-
-    const servers = await prisma.server.findMany({
-      where: {
-        id: {
-          in: guildIds,
-        },
-      },
-      select: {
-        id: true,
-      },
-    });
-
-    return res.json({
-      success: true,
-      serverIds: servers.map((s) => s.id),
     });
   } catch (error) {
     next(error);
