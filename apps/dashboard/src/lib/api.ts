@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getSession } from 'next-auth/react';
 
 import type { ExportData } from './types';
 
@@ -10,7 +11,7 @@ export const api = axios.create({
 });
 
 // Request interceptor to add auth and server headers
-api.interceptors.request.use((config) => {
+api.interceptors.request.use(async (config) => {
   // Get server ID from localStorage
   const serverId = typeof window !== 'undefined'
     ? localStorage.getItem('selectedServerId')
@@ -18,6 +19,14 @@ api.interceptors.request.use((config) => {
 
   if (serverId) {
     config.headers['X-Server-Id'] = serverId;
+  }
+
+  // Get session token for authentication
+  if (typeof window !== 'undefined') {
+    const session = await getSession();
+    if (session?.accessToken) {
+      config.headers['Authorization'] = `Bearer ${session.accessToken}`;
+    }
   }
 
   return config;
