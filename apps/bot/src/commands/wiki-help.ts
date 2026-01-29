@@ -35,8 +35,20 @@ const command: Command = {
                  '**Example:** `/wiki-view getting-started`',
         },
         {
+          name: '📋 /wiki-list `[category]`',
+          value: 'List all articles, optionally filtered by category.',
+        },
+        {
           name: '✏️ /wiki-create',
           value: 'Create a new article. Opens a form to enter the title, content, and optional category.',
+        },
+        {
+          name: '📁 /wiki-category `create|list|delete`',
+          value: 'Manage categories (requires Manage Server permission).',
+        },
+        {
+          name: '📊 /wiki-stats',
+          value: 'View server statistics: articles, categories, views, searches.',
         },
         {
           name: '❓ /wiki-help',

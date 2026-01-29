@@ -36,6 +36,7 @@ loadCommands(client);
 import('./events/ready');
 import('./events/interactionCreate');
 import('./events/guildCreate');
+import('./events/guildDelete');
 
 // Auto-reconnect configuration
 const MAX_RECONNECT_ATTEMPTS = 10;
