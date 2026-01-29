@@ -95,7 +95,7 @@ export default function ArticlesPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1 max-w-sm">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
@@ -130,23 +130,23 @@ export default function ArticlesPage() {
       )}
 
       {/* Articles Table */}
-      <div className="bg-card rounded-xl border overflow-hidden">
+      <div className="bg-card rounded-xl border overflow-x-auto">
         <table className="w-full">
           <thead className="bg-muted/50">
             <tr>
-              <th className="text-left px-6 py-3 text-sm font-medium text-muted-foreground">
+              <th className="text-left px-4 sm:px-6 py-3 text-sm font-medium text-muted-foreground">
                 Title
               </th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-muted-foreground">
+              <th className="text-left px-4 sm:px-6 py-3 text-sm font-medium text-muted-foreground">
                 Category
               </th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-muted-foreground">
+              <th className="hidden sm:table-cell text-left px-4 sm:px-6 py-3 text-sm font-medium text-muted-foreground">
                 Stats
               </th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-muted-foreground">
+              <th className="hidden sm:table-cell text-left px-4 sm:px-6 py-3 text-sm font-medium text-muted-foreground">
                 Updated
               </th>
-              <th className="text-left px-6 py-3 text-sm font-medium text-muted-foreground">
+              <th className="text-left px-4 sm:px-6 py-3 text-sm font-medium text-muted-foreground">
                 Actions
               </th>
             </tr>
@@ -164,13 +164,13 @@ export default function ArticlesPage() {
             {/* Articles */}
             {!isLoading && filteredArticles.map((article: Article) => (
               <tr key={article.id} className="hover:bg-muted/30 transition-colors">
-                <td className="px-6 py-4">
+                <td className="px-4 sm:px-6 py-4">
                   <div>
                     <p className="font-medium">{article.title}</p>
                     <p className="text-sm text-muted-foreground">/{article.slug}</p>
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-4 sm:px-6 py-4">
                   {article.category ? (
                     <span className="inline-flex items-center gap-1 px-2 py-1 bg-muted rounded text-sm">
                       {article.category.emoji} {article.category.name}
@@ -179,7 +179,7 @@ export default function ArticlesPage() {
                     <span className="text-muted-foreground text-sm">None</span>
                   )}
                 </td>
-                <td className="px-6 py-4">
+                <td className="hidden sm:table-cell px-4 sm:px-6 py-4">
                   <div className="flex items-center gap-4 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Eye className="w-4 h-4" />
@@ -191,10 +191,10 @@ export default function ArticlesPage() {
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-sm text-muted-foreground">
+                <td className="hidden sm:table-cell px-4 sm:px-6 py-4 text-sm text-muted-foreground">
                   {formatDate(article.updatedAt)}
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-4 sm:px-6 py-4">
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/dashboard/articles/${article.slug}`}

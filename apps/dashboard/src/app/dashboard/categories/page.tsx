@@ -113,7 +113,7 @@ export default function CategoriesPage() {
                 key={category.id}
                 className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors"
               >
-                <GripVertical className="w-5 h-5 text-muted-foreground cursor-move" />
+                <GripVertical className="hidden sm:block w-5 h-5 text-muted-foreground cursor-move" />
                 <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center text-xl">
                   {category.emoji || '📁'}
                 </div>
@@ -123,7 +123,7 @@ export default function CategoriesPage() {
                     {category.description || 'No description'}
                   </p>
                 </div>
-                <span className="text-sm text-muted-foreground">
+                <span className="hidden sm:inline text-sm text-muted-foreground">
                   {category._count?.articles || 0} articles
                 </span>
                 <div className="flex items-center gap-2">
@@ -152,8 +152,8 @@ export default function CategoriesPage() {
 
       {/* Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-card p-6 rounded-xl w-full max-w-md">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-card p-6 rounded-xl w-full max-w-md mx-4 sm:mx-0">
             <h2 className="text-xl font-bold mb-4">
               {editingCategory ? 'Edit Category' : 'New Category'}
             </h2>
