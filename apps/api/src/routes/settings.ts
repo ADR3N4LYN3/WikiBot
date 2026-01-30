@@ -111,6 +111,19 @@ settingsRouter.put('/', asyncHandler(async (req, res, _next) => {
     throw new AppError(403, 'Forbidden', 'Custom logo is a premium feature');
   }
 
+  // Check premium-only features
+  const premiumOnlyFeatures = {
+    aiSearchEnabled,
+    moderationEnabled,
+    fastIndexingEnabled,
+  };
+
+  for (const [feature, enabled] of Object.entries(premiumOnlyFeatures)) {
+    if (enabled === true && server?.premiumTier === 'free') {
+      throw new AppError(403, 'Forbidden', `${feature} is a premium feature. Upgrade to Premium or Pro.`);
+    }
+  }
+
   // Get old settings for audit log
   const oldSettings = await prisma.serverSettings.findUnique({
     where: { serverId },
