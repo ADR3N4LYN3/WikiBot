@@ -127,7 +127,7 @@ export function Features() {
         >
           {features.map((feature) => (
             <motion.div key={feature.title} variants={itemVariants}>
-              <GlassCard className="h-full p-4 sm:p-6 group">
+              <GlassCard className="h-full p-4 sm:p-6 group flex flex-col items-center text-center">
                 {/* Icon */}
                 <div
                   className={cn(
