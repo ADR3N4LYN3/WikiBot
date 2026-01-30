@@ -5,10 +5,17 @@ export interface Category {
   slug: string;
   description?: string | null;
   emoji?: string | null;
-  order: number;
+  position: number;
   _count?: {
     articles: number;
   };
+}
+
+// Author type for articles
+export interface ArticleAuthor {
+  id: string;
+  username: string;
+  avatar?: string | null;
 }
 
 // Article types
@@ -20,9 +27,11 @@ export interface Article {
   published: boolean;
   views: number;
   helpful: number;
+  notHelpful: number;
   createdAt: string;
   updatedAt: string;
   category?: Category | null;
+  author?: ArticleAuthor;
 }
 
 export interface ArticlesResponse {

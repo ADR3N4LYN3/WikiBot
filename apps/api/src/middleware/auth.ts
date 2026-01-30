@@ -45,11 +45,18 @@ function isBotRequest(req: Request): boolean {
   const botToken = req.headers['x-bot-token'] as string;
   const expectedToken = process.env.BOT_API_SECRET;
 
-  // If no secret is configured, allow bot requests (dev mode)
-  if (!expectedToken) {
-    return !!botToken;
+  // No bot token header provided
+  if (!botToken) {
+    return false;
   }
 
+  // SECURITY: Require BOT_API_SECRET to be configured
+  if (!expectedToken) {
+    console.warn('⚠️ BOT_API_SECRET not configured - bot requests are disabled');
+    return false;
+  }
+
+  // Validate bot token matches expected secret
   return botToken === expectedToken;
 }
 
@@ -57,8 +64,15 @@ function isBotRequest(req: Request): boolean {
 async function verifyNextAuthToken(token: string): Promise<JWTUser | null> {
   const secret = getJWTSecret();
 
-  // If no secret configured, try to decode without verification (dev mode only)
+  // SECURITY: If no secret configured, only allow in development mode
   if (secret.length === 0) {
+    if (process.env.NODE_ENV === 'production') {
+      console.error('❌ NEXTAUTH_SECRET not configured in production - rejecting all JWT tokens');
+      return null;
+    }
+
+    // Dev mode only: decode without verification
+    console.warn('⚠️ Dev mode: JWT decoded without verification');
     try {
       const decoded = decodeJwt(token) as NextAuthJWT;
       if (decoded.discordId || decoded.sub) {

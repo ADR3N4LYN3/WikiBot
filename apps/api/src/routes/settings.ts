@@ -4,9 +4,9 @@ import { z } from 'zod';
 
 import { requireAuth, extractServerId, AuthenticatedRequest } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
+import * as auditLogService from '../services/auditLogService';
 import * as memberService from '../services/memberService';
 import * as uploadService from '../services/uploadService';
-import * as auditLogService from '../services/auditLogService';
 
 export const settingsRouter = Router();
 
