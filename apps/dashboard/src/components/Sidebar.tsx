@@ -12,6 +12,8 @@ import {
   Crown,
   X,
   ToggleRight,
+  Users,
+  ScrollText,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -23,7 +25,9 @@ const navigation = [
   { name: 'Overview', href: '/dashboard', icon: Home },
   { name: 'Articles', href: '/dashboard/articles', icon: BookOpen },
   { name: 'Categories', href: '/dashboard/categories', icon: FolderOpen },
+  { name: 'Members', href: '/dashboard/members', icon: Users },
   { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
+  { name: 'Audit Logs', href: '/dashboard/audit-logs', icon: ScrollText },
   { name: 'Modules', href: '/dashboard/modules', icon: ToggleRight },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];

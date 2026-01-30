@@ -113,3 +113,34 @@ export const exportApi = {
     api.post('/api/v1/export/import', { data, ...options }),
   validate: (data: ExportData) => api.post('/api/v1/export/validate', { data }),
 };
+
+export const membersApi = {
+  getAll: () => api.get('/api/v1/members'),
+  getMe: () => api.get('/api/v1/members/me'),
+  getById: (userId: string) => api.get(`/api/v1/members/${userId}`),
+  add: (data: {
+    userId: string;
+    role?: 'admin' | 'editor' | 'viewer';
+    username?: string;
+    discriminator?: string;
+    avatar?: string;
+  }) => api.post('/api/v1/members', data),
+  updateRole: (userId: string, role: 'admin' | 'editor' | 'viewer') =>
+    api.put(`/api/v1/members/${userId}/role`, { role }),
+  remove: (userId: string) => api.delete(`/api/v1/members/${userId}`),
+  transferOwnership: (newOwnerId: string) =>
+    api.post('/api/v1/members/transfer-ownership', { newOwnerId }),
+};
+
+export const auditLogsApi = {
+  getAll: (params?: {
+    limit?: number;
+    offset?: number;
+    entityType?: 'article' | 'category' | 'settings' | 'member';
+    action?: string;
+    actorId?: string;
+    startDate?: string;
+    endDate?: string;
+  }) => api.get('/api/v1/audit-logs', { params }),
+  getById: (logId: string) => api.get(`/api/v1/audit-logs/${logId}`),
+};
