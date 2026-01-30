@@ -36,7 +36,7 @@ export const GlassCard = forwardRef<HTMLDivElement, GlassCardProps>(
         <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/5 pointer-events-none" />
 
         {/* Content */}
-        <div className="relative z-10">{children}</div>
+        <div className="relative z-10 h-full w-full">{children}</div>
       </motion.div>
     );
   }
