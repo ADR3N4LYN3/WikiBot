@@ -1,5 +1,8 @@
-import { Metadata } from 'next';
-import { Mail, MessageSquare, Clock } from 'lucide-react';
+'use client';
+
+import { useState } from 'react';
+import { Mail, MessageSquare, Clock, Loader2, CheckCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 import { GlassCard } from '@/components/ui/GlassCard';
 import { GradientText } from '@/components/ui/GradientText';
@@ -7,11 +10,6 @@ import { GradientButton } from '@/components/ui/GradientButton';
 import { Navbar } from '@/components/marketing/Navbar';
 import { Footer } from '@/components/marketing/Footer';
 import { cn } from '@/lib/utils';
-
-export const metadata: Metadata = {
-  title: 'Contact - WikiBot',
-  description: 'Get in touch with the WikiBot team. We\'re here to help.',
-};
 
 const contactMethods = [
   {
@@ -30,7 +28,77 @@ const contactMethods = [
   },
 ];
 
+const categories = [
+  { id: 'general', label: 'General Inquiry' },
+  { id: 'support', label: 'Technical Support' },
+  { id: 'billing', label: 'Billing & Subscriptions' },
+  { id: 'partnership', label: 'Partnership' },
+  { id: 'other', label: 'Other' },
+];
+
 export default function ContactPage() {
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [category, setCategory] = useState('general');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [ticketId, setTicketId] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!name.trim() || !email.trim() || !subject.trim() || !message.trim()) {
+      toast.error('Please fill in all fields');
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/v1/contact`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: name.trim(),
+            email: email.trim(),
+            subject: subject.trim(),
+            message: message.trim(),
+            category,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to send message');
+      }
+
+      const result = await response.json();
+      setTicketId(result.ticketId);
+      setSubmitted(true);
+      toast.success('Message sent successfully!');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Failed to send message');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
+    setName('');
+    setEmail('');
+    setSubject('');
+    setMessage('');
+    setCategory('general');
+    setSubmitted(false);
+    setTicketId('');
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -72,87 +140,155 @@ export default function ContactPage() {
 
             {/* Contact Form */}
             <GlassCard className="p-6 sm:p-10">
-              <h2 className="text-2xl font-bold mb-6">Send us a message</h2>
+              {submitted ? (
+                <div className="text-center py-8">
+                  <CheckCircle className="w-16 h-16 mx-auto text-green-500 mb-4" />
+                  <h2 className="text-2xl font-bold mb-2">Message Sent!</h2>
+                  <p className="text-muted-foreground mb-4">
+                    Thank you for contacting us. We&apos;ll get back to you within 24-48 hours.
+                  </p>
+                  {ticketId && (
+                    <p className="text-sm text-muted-foreground mb-6">
+                      Your ticket ID: <span className="font-mono font-semibold">{ticketId}</span>
+                    </p>
+                  )}
+                  <button
+                    onClick={resetForm}
+                    className="text-primary hover:underline"
+                  >
+                    Send another message
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-2xl font-bold mb-6">Send us a message</h2>
 
-              <form className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="name" className="block text-sm font-medium mb-2">
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
-                      name="name"
-                      className={cn(
-                        'w-full px-4 py-3 rounded-xl',
-                        'bg-muted/50 border border-border',
-                        'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
-                        'transition-all duration-300'
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div>
+                        <label htmlFor="name" className="block text-sm font-medium mb-2">
+                          Name
+                        </label>
+                        <input
+                          type="text"
+                          id="name"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className={cn(
+                            'w-full px-4 py-3 rounded-xl',
+                            'bg-muted/50 border border-border',
+                            'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
+                            'transition-all duration-300'
+                          )}
+                          placeholder="Your name"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="email" className="block text-sm font-medium mb-2">
+                          Email
+                        </label>
+                        <input
+                          type="email"
+                          id="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className={cn(
+                            'w-full px-4 py-3 rounded-xl',
+                            'bg-muted/50 border border-border',
+                            'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
+                            'transition-all duration-300'
+                          )}
+                          placeholder="you@example.com"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div>
+                        <label htmlFor="category" className="block text-sm font-medium mb-2">
+                          Category
+                        </label>
+                        <select
+                          id="category"
+                          value={category}
+                          onChange={(e) => setCategory(e.target.value)}
+                          className={cn(
+                            'w-full px-4 py-3 rounded-xl',
+                            'bg-muted/50 border border-border',
+                            'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
+                            'transition-all duration-300'
+                          )}
+                        >
+                          {categories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                              {cat.label}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label htmlFor="subject" className="block text-sm font-medium mb-2">
+                          Subject
+                        </label>
+                        <input
+                          type="text"
+                          id="subject"
+                          value={subject}
+                          onChange={(e) => setSubject(e.target.value)}
+                          className={cn(
+                            'w-full px-4 py-3 rounded-xl',
+                            'bg-muted/50 border border-border',
+                            'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
+                            'transition-all duration-300'
+                          )}
+                          placeholder="How can we help?"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label htmlFor="message" className="block text-sm font-medium mb-2">
+                        Message
+                      </label>
+                      <textarea
+                        id="message"
+                        value={message}
+                        onChange={(e) => setMessage(e.target.value)}
+                        rows={5}
+                        className={cn(
+                          'w-full px-4 py-3 rounded-xl',
+                          'bg-muted/50 border border-border',
+                          'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
+                          'transition-all duration-300',
+                          'resize-none'
+                        )}
+                        placeholder="Tell us more... (minimum 20 characters)"
+                        required
+                        minLength={20}
+                      />
+                    </div>
+
+                    <GradientButton
+                      type="submit"
+                      size="lg"
+                      className="w-full sm:w-auto"
+                      disabled={submitting}
+                    >
+                      {submitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        'Send message'
                       )}
-                      placeholder="Your name"
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium mb-2">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      className={cn(
-                        'w-full px-4 py-3 rounded-xl',
-                        'bg-muted/50 border border-border',
-                        'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
-                        'transition-all duration-300'
-                      )}
-                      placeholder="you@example.com"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label htmlFor="subject" className="block text-sm font-medium mb-2">
-                    Subject
-                  </label>
-                  <input
-                    type="text"
-                    id="subject"
-                    name="subject"
-                    className={cn(
-                      'w-full px-4 py-3 rounded-xl',
-                      'bg-muted/50 border border-border',
-                      'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
-                      'transition-all duration-300'
-                    )}
-                    placeholder="How can we help?"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium mb-2">
-                    Message
-                  </label>
-                  <textarea
-                    id="message"
-                    name="message"
-                    rows={5}
-                    className={cn(
-                      'w-full px-4 py-3 rounded-xl',
-                      'bg-muted/50 border border-border',
-                      'focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary',
-                      'transition-all duration-300',
-                      'resize-none'
-                    )}
-                    placeholder="Tell us more..."
-                  />
-                </div>
-
-                <GradientButton type="submit" size="lg" className="w-full sm:w-auto">
-                  Send message
-                </GradientButton>
-              </form>
+                    </GradientButton>
+                  </form>
+                </>
+              )}
             </GlassCard>
           </div>
         </section>

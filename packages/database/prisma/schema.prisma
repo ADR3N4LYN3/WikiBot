@@ -23,6 +23,8 @@ model Server {
   articles   Article[]
   categories Category[]
   settings   ServerSettings?
+  members    ServerMember[]
+  auditLogs  AuditLog[]
 
   @@map("servers")
 }
@@ -60,12 +62,56 @@ model User {
   username      String
   discriminator String
   avatar        String?
+  email         String?
   createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  articles Article[]     @relation("ArticleAuthor")
-  edits    ArticleEdit[]
+  articles    Article[]      @relation("ArticleAuthor")
+  edits       ArticleEdit[]
+  memberships ServerMember[]
+  auditLogs   AuditLog[]     @relation("AuditLogActor")
 
   @@map("users")
+}
+
+// Server member with role
+model ServerMember {
+  id        String   @id @default(cuid())
+  serverId  String
+  userId    String
+  role      String   @default("viewer") // owner, admin, editor, viewer
+  joinedAt  DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([serverId, userId])
+  @@index([serverId])
+  @@index([userId])
+  @@map("server_members")
+}
+
+// Audit log for tracking changes
+model AuditLog {
+  id         String   @id @default(cuid())
+  serverId   String
+  actorId    String
+  action     String // create, update, delete, settings_change, member_add, etc.
+  entityType String // article, category, settings, member
+  entityId   String?
+  details    String?  @db.Text // JSON with old/new values
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime @default(now())
+
+  server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  actor  User   @relation("AuditLogActor", fields: [actorId], references: [id])
+
+  @@index([serverId, createdAt])
+  @@index([serverId, entityType])
+  @@index([actorId])
+  @@map("audit_logs")
 }
 
 // Article category for organization

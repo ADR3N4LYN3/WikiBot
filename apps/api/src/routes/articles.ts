@@ -1,14 +1,21 @@
 import { articleCreateSchema, articleUpdateSchema } from '@wikibot/shared';
-import { Router } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 
-
-import { requireAuth, requireServerId } from '../middleware/auth';
+import { requireAuth, requireServerId, AuthenticatedRequest } from '../middleware/auth';
+import { AppError } from '../middleware/errorHandler';
 import * as articleService from '../services/articleService';
 
 export const articlesRouter = Router();
 
+// Wrapper to handle async middleware with proper typing
+const asyncHandler = (fn: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req as AuthenticatedRequest, res, next)).catch(next);
+  };
+};
+
 // Apply auth and serverId middleware to all routes
-articlesRouter.use(requireAuth);
+articlesRouter.use(requireAuth as (req: Request, res: Response, next: NextFunction) => void);
 articlesRouter.use(requireServerId);
 
 // Get all articles for a server
@@ -46,41 +53,43 @@ articlesRouter.get('/:slug', async (req, res, next) => {
 });
 
 // Create article
-articlesRouter.post('/', async (req, res, next) => {
-  try {
-    const serverId = req.serverId!;
-    const userId = req.user?.id || 'system'; // TODO: Get from JWT
+articlesRouter.post('/', asyncHandler(async (req, res, _next) => {
+  const serverId = req.serverId;
+  const user = req.user;
 
-    const input = articleCreateSchema.parse(req.body);
-
-    const article = await articleService.createArticle({
-      serverId,
-      authorId: userId,
-      ...input,
-    });
-
-    res.status(201).json(article);
-  } catch (error) {
-    next(error);
+  // Require authenticated user (not bot) for creating articles
+  if (!user || req.isBot) {
+    throw new AppError(403, 'Forbidden', 'User authentication required to create articles');
   }
-});
+
+  const input = articleCreateSchema.parse(req.body);
+
+  const article = await articleService.createArticle({
+    serverId,
+    authorId: user.id,
+    ...input,
+  });
+
+  res.status(201).json(article);
+}));
 
 // Update article
-articlesRouter.put('/:slug', async (req, res, next) => {
-  try {
-    const serverId = req.serverId!;
-    const { slug } = req.params;
-    const userId = req.user?.id || 'system';
+articlesRouter.put('/:slug', asyncHandler(async (req, res, _next) => {
+  const serverId = req.serverId;
+  const { slug } = req.params;
+  const user = req.user;
 
-    const input = articleUpdateSchema.parse(req.body);
-
-    const article = await articleService.updateArticle(serverId, slug, userId, input);
-
-    res.json(article);
-  } catch (error) {
-    next(error);
+  // Require authenticated user (not bot) for updating articles
+  if (!user || req.isBot) {
+    throw new AppError(403, 'Forbidden', 'User authentication required to update articles');
   }
-});
+
+  const input = articleUpdateSchema.parse(req.body);
+
+  const article = await articleService.updateArticle(serverId, slug, user.id, input);
+
+  res.json(article);
+}));
 
 // Delete article
 articlesRouter.delete('/:slug', async (req, res, next) => {

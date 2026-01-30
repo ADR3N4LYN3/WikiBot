@@ -1,23 +1,121 @@
 'use client';
 
 import { useState } from 'react';
+import { useSession } from 'next-auth/react';
 import useSWR from 'swr';
-import { Plus, Pencil, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Pencil, Trash2, GripVertical, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 import { categoriesApi } from '@/lib/api';
 import { generateSlug } from '@/lib/utils';
 import type { Category, ApiError } from '@/lib/types';
 
+interface SortableCategoryProps {
+  category: Category;
+  onEdit: (category: Category) => void;
+  onDelete: (slug: string) => void;
+}
+
+function SortableCategory({ category, onEdit, onDelete }: SortableCategoryProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: category.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`flex items-center gap-4 p-4 bg-card hover:bg-muted/30 transition-colors ${
+        isDragging ? 'z-50 shadow-lg' : ''
+      }`}
+    >
+      <button
+        {...attributes}
+        {...listeners}
+        className="hidden sm:block touch-none cursor-grab active:cursor-grabbing p-1 hover:bg-muted rounded"
+      >
+        <GripVertical className="w-5 h-5 text-muted-foreground" />
+      </button>
+      <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center text-xl">
+        {category.emoji || '📁'}
+      </div>
+      <div className="flex-1">
+        <p className="font-medium">{category.name}</p>
+        <p className="text-sm text-muted-foreground">
+          {category.description || 'No description'}
+        </p>
+      </div>
+      <span className="hidden sm:inline text-sm text-muted-foreground">
+        {category._count?.articles || 0} articles
+      </span>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => onEdit(category)}
+          className="p-2 hover:bg-muted rounded-lg transition-colors"
+        >
+          <Pencil className="w-4 h-4" />
+        </button>
+        <button
+          onClick={() => onDelete(category.slug)}
+          className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function CategoriesPage() {
+  const { data: session } = useSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [emoji, setEmoji] = useState('');
+  const [reordering, setReordering] = useState(false);
 
   const { data: categories, mutate } = useSWR('categories', () =>
     categoriesApi.getAll().then((res) => res.data)
+  );
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
   );
 
   const openModal = (category?: Category) => {
@@ -83,8 +181,55 @@ export default function CategoriesPage() {
       await categoriesApi.delete(slug);
       toast.success('Category deleted');
       mutate();
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete category');
+    }
+  };
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id || !categories) return;
+
+    const oldIndex = categories.findIndex((c: Category) => c.id === active.id);
+    const newIndex = categories.findIndex((c: Category) => c.id === over.id);
+
+    if (oldIndex === -1 || newIndex === -1) return;
+
+    // Optimistically update the UI
+    const newCategories = arrayMove(categories, oldIndex, newIndex) as Category[];
+    mutate(newCategories, false);
+
+    // Save to backend
+    setReordering(true);
+    try {
+      const serverId = localStorage.getItem('selectedServerId');
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000'}/api/v1/categories/reorder`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Server-Id': serverId || '',
+            Authorization: `Bearer ${session?.accessToken}`,
+          },
+          body: JSON.stringify({
+            categoryIds: newCategories.map((c) => c.id),
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to reorder');
+      }
+
+      toast.success('Categories reordered');
+    } catch {
+      // Revert on error
+      mutate();
+      toast.error('Failed to reorder categories');
+    } finally {
+      setReordering(false);
     }
   };
 
@@ -93,7 +238,15 @@ export default function CategoriesPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Categories</h1>
-          <p className="text-muted-foreground">Organize your articles into categories</p>
+          <p className="text-muted-foreground">
+            Organize your articles into categories
+            {reordering && (
+              <span className="ml-2 inline-flex items-center gap-1 text-primary">
+                <Loader2 className="w-3 h-3 animate-spin" />
+                Saving...
+              </span>
+            )}
+          </p>
         </div>
         <button
           onClick={() => openModal()}
@@ -104,51 +257,40 @@ export default function CategoriesPage() {
         </button>
       </div>
 
-      {/* Categories List */}
-      <div className="bg-card rounded-xl border">
+      {/* Categories List with Drag & Drop */}
+      <div className="bg-card rounded-xl border overflow-hidden">
         {categories?.length ? (
-          <div className="divide-y">
-            {categories.map((category: Category) => (
-              <div
-                key={category.id}
-                className="flex items-center gap-4 p-4 hover:bg-muted/30 transition-colors"
-              >
-                <GripVertical className="hidden sm:block w-5 h-5 text-muted-foreground cursor-move" />
-                <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center text-xl">
-                  {category.emoji || '📁'}
-                </div>
-                <div className="flex-1">
-                  <p className="font-medium">{category.name}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {category.description || 'No description'}
-                  </p>
-                </div>
-                <span className="hidden sm:inline text-sm text-muted-foreground">
-                  {category._count?.articles || 0} articles
-                </span>
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => openModal(category)}
-                    className="p-2 hover:bg-muted rounded-lg transition-colors"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(category.slug)}
-                    className="p-2 hover:bg-destructive/10 text-destructive rounded-lg transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
+            <SortableContext
+              items={categories.map((c: Category) => c.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="divide-y">
+                {categories.map((category: Category) => (
+                  <SortableCategory
+                    key={category.id}
+                    category={category}
+                    onEdit={openModal}
+                    onDelete={handleDelete}
+                  />
+                ))}
               </div>
-            ))}
-          </div>
+            </SortableContext>
+          </DndContext>
         ) : (
           <div className="p-12 text-center text-muted-foreground">
             No categories yet. Create one to organize your articles.
           </div>
         )}
       </div>
+
+      <p className="text-sm text-muted-foreground text-center">
+        Drag and drop to reorder categories
+      </p>
 
       {/* Modal */}
       {isModalOpen && (

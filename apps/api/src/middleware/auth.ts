@@ -1,12 +1,43 @@
 import { Request, Response, NextFunction } from 'express';
+import { jwtVerify, decodeJwt } from 'jose';
 
 import { AppError } from './errorHandler';
 
-// Extended Request type with serverId
+// User info extracted from JWT
+export interface JWTUser {
+  id: string; // Discord ID
+  name?: string;
+  email?: string;
+  image?: string;
+}
+
+// Extended Request type with auth info
 export interface AuthenticatedRequest extends Request {
   serverId: string;
-  userId?: string;
+  user?: JWTUser;
   isBot?: boolean;
+}
+
+// NextAuth v5 JWT structure
+interface NextAuthJWT {
+  discordId?: string;
+  name?: string;
+  email?: string;
+  picture?: string;
+  sub?: string;
+  iat?: number;
+  exp?: number;
+  jti?: string;
+}
+
+// Get the secret for JWT verification (NextAuth uses this)
+function getJWTSecret(): Uint8Array {
+  const secret = process.env.NEXTAUTH_SECRET;
+  if (!secret) {
+    console.warn('⚠️ NEXTAUTH_SECRET not configured - JWT validation disabled');
+    return new Uint8Array(0);
+  }
+  return new TextEncoder().encode(secret);
 }
 
 // Check if request is from the bot
@@ -22,33 +53,91 @@ function isBotRequest(req: Request): boolean {
   return botToken === expectedToken;
 }
 
-// Simple auth middleware - accepts both user JWT and bot token
-export function requireAuth(req: Request, _res: Response, next: NextFunction) {
-  // Check for bot token first
-  if (isBotRequest(req)) {
-    (req as AuthenticatedRequest).isBot = true;
-    return next();
+// Verify and decode NextAuth JWT token
+async function verifyNextAuthToken(token: string): Promise<JWTUser | null> {
+  const secret = getJWTSecret();
+
+  // If no secret configured, try to decode without verification (dev mode only)
+  if (secret.length === 0) {
+    try {
+      const decoded = decodeJwt(token) as NextAuthJWT;
+      if (decoded.discordId || decoded.sub) {
+        return {
+          id: decoded.discordId || decoded.sub || 'unknown',
+          name: decoded.name,
+          email: decoded.email,
+          image: decoded.picture,
+        };
+      }
+    } catch {
+      return null;
+    }
+    return null;
   }
 
-  // Check for user Bearer token
-  const authHeader = req.headers.authorization;
+  try {
+    // NextAuth v5 uses HS256 by default
+    const { payload } = await jwtVerify(token, secret, {
+      algorithms: ['HS256'],
+    });
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw new AppError(401, 'Unauthorized', 'No authentication token provided');
+    const jwt = payload as unknown as NextAuthJWT;
+
+    // Extract user info from JWT
+    const userId = jwt.discordId || jwt.sub;
+    if (!userId) {
+      return null;
+    }
+
+    return {
+      id: userId,
+      name: jwt.name,
+      email: jwt.email,
+      image: jwt.picture,
+    };
+  } catch (error) {
+    // Token verification failed
+    console.error('JWT verification failed:', error instanceof Error ? error.message : 'Unknown error');
+    return null;
   }
+}
 
-  // TODO: Verify JWT token from NextAuth
-  // For now, we'll just extract the token
-  const token = authHeader.substring(7);
+// Auth middleware - accepts both user JWT and bot token
+export async function requireAuth(req: Request, _res: Response, next: NextFunction) {
+  try {
+    // Check for bot token first
+    if (isBotRequest(req)) {
+      (req as AuthenticatedRequest).isBot = true;
+      return next();
+    }
 
-  if (!token) {
-    throw new AppError(401, 'Unauthorized', 'Invalid authentication token');
+    // Check for user Bearer token
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new AppError(401, 'Unauthorized', 'No authentication token provided');
+    }
+
+    const token = authHeader.substring(7);
+
+    if (!token) {
+      throw new AppError(401, 'Unauthorized', 'Invalid authentication token');
+    }
+
+    // Verify JWT and extract user info
+    const user = await verifyNextAuthToken(token);
+
+    if (!user) {
+      throw new AppError(401, 'Unauthorized', 'Invalid or expired token');
+    }
+
+    // Attach user info to request
+    (req as AuthenticatedRequest).user = user;
+
+    next();
+  } catch (error) {
+    next(error);
   }
-
-  // Attach user info to request (after JWT verification)
-  // req.user = decodedToken;
-
-  next();
 }
 
 // Middleware to extract serverId from request
@@ -67,3 +156,32 @@ export function requireServerId(req: Request, _res: Response, next: NextFunction
 
 // Alias for extractServerId
 export const extractServerId = requireServerId;
+
+// Optional auth middleware - doesn't fail if no token, but extracts user if present
+export async function optionalAuth(req: Request, _res: Response, next: NextFunction) {
+  try {
+    // Check for bot token first
+    if (isBotRequest(req)) {
+      (req as AuthenticatedRequest).isBot = true;
+      return next();
+    }
+
+    // Check for user Bearer token
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.substring(7);
+      if (token) {
+        const user = await verifyNextAuthToken(token);
+        if (user) {
+          (req as AuthenticatedRequest).user = user;
+        }
+      }
+    }
+
+    next();
+  } catch {
+    // Ignore auth errors in optional mode
+    next();
+  }
+}

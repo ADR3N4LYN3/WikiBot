@@ -7,9 +7,12 @@ import { errorHandler } from './middleware/errorHandler';
 import { rateLimiter } from './middleware/rateLimiter';
 import { analyticsRouter } from './routes/analytics';
 import { articlesRouter } from './routes/articles';
+import { auditLogsRouter } from './routes/auditLogs';
 import { categoriesRouter } from './routes/categories';
+import { contactRouter } from './routes/contact';
 import { exportRouter } from './routes/export';
 import { healthRouter } from './routes/health';
+import { membersRouter } from './routes/members';
 import { publicRouter } from './routes/public';
 import { searchRouter } from './routes/search';
 import { serversRouter } from './routes/servers';
@@ -69,6 +72,9 @@ app.use('/api/v1/export', exportRouter);
 app.use('/api/v1/servers', serversRouter);
 app.use('/api/v1/settings', settingsRouter);
 app.use('/api/v1/stats', statsRouter);
+app.use('/api/v1/members', membersRouter);
+app.use('/api/v1/audit-logs', auditLogsRouter);
+app.use('/api/v1/contact', contactRouter);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

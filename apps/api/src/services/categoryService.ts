@@ -81,3 +81,27 @@ export async function deleteCategory(serverId: string, slug: string) {
     },
   });
 }
+
+export async function reorderCategories(serverId: string, categoryIds: string[]) {
+  // Verify all categories belong to the server
+  const categories = await prisma.category.findMany({
+    where: {
+      serverId,
+      id: { in: categoryIds },
+    },
+  });
+
+  if (categories.length !== categoryIds.length) {
+    throw new AppError(400, 'Invalid category IDs');
+  }
+
+  // Update positions in a transaction
+  await prisma.$transaction(
+    categoryIds.map((id, index) =>
+      prisma.category.update({
+        where: { id },
+        data: { position: index },
+      })
+    )
+  );
+}
