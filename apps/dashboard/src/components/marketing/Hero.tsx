@@ -111,8 +111,8 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          Create, organize, and share articles with your community.
-          Instant search, beautiful dashboard, and powerful moderation.
+          Create and connect articles with [[wiki-links]]. AI-powered search,
+          per-article analytics, and a beautiful editor with slash commands.
         </motion.p>
 
         {/* CTA Buttons */}

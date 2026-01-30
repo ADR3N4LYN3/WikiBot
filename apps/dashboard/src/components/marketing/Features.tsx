@@ -6,10 +6,10 @@ import {
   BookOpen,
   BarChart3,
   Shield,
-  Zap,
   Users,
-  Globe,
   Sparkles,
+  Link2,
+  Slash,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
@@ -32,45 +32,45 @@ const features = [
     gradient: 'from-secondary to-accent',
   },
   {
-    icon: BarChart3,
-    title: 'Analytics',
+    icon: Link2,
+    title: 'Knowledge graph',
     description:
-      'Track views, searches, and engagement. Know what your community needs.',
+      'Link articles together with [[wiki-style]] links. See backlinks and build a connected knowledge base.',
     gradient: 'from-accent to-primary',
+  },
+  {
+    icon: BarChart3,
+    title: 'Per-article analytics',
+    description:
+      'Track daily views, time spent, and helpfulness ratings for each article.',
+    gradient: 'from-green-500 to-emerald-500',
+  },
+  {
+    icon: Slash,
+    title: 'Slash commands',
+    description:
+      'Type / in the editor to quickly insert headings, code blocks, callouts, and images.',
+    gradient: 'from-yellow-500 to-orange-500',
   },
   {
     icon: Shield,
     title: 'Permissions',
     description:
       'Control who can create, edit, and delete articles with role-based permissions.',
-    gradient: 'from-green-500 to-emerald-500',
-  },
-  {
-    icon: Zap,
-    title: 'Lightning fast',
-    description:
-      'Responses in milliseconds. No loading, no waiting. Just answers.',
-    gradient: 'from-yellow-500 to-orange-500',
+    gradient: 'from-pink-500 to-rose-500',
   },
   {
     icon: Users,
     title: 'Multi-server',
     description:
       'Manage multiple Discord servers from a single dashboard. Sync articles across servers.',
-    gradient: 'from-pink-500 to-rose-500',
-  },
-  {
-    icon: Globe,
-    title: 'Public wiki',
-    description:
-      'Optionally make your wiki public on the web. SEO-friendly and shareable.',
     gradient: 'from-cyan-500 to-blue-500',
   },
   {
     icon: Sparkles,
     title: 'AI-powered',
     description:
-      'Coming soon: AI-powered article suggestions and automatic answers.',
+      'Semantic search with AI embeddings and RAG-powered answers using GPT-4.',
     gradient: 'from-purple-500 to-violet-500',
   },
 ];
