@@ -8,6 +8,9 @@ Documentation des fonctionnalités du dashboard WikiBot.
 - [Page Modules](#page-modules)
 - [Command Palette](#command-palette)
 - [Onboarding Wizard](#onboarding-wizard)
+- [Category Drag & Drop](#category-drag--drop)
+- [Article Import](#article-import)
+- [Contact Form](#contact-form)
 - [Composants UI](#composants-ui)
 - [API Publique](#api-publique)
 - [API Client](#api-client)
@@ -188,6 +191,152 @@ import { OnboardingWizard } from '@/components/onboarding';
     }}
   />
 )}
+```
+
+---
+
+## Category Drag & Drop
+
+**Localisation**: `/dashboard/categories`
+
+Réorganisation des catégories par glisser-déposer avec mise à jour temps réel.
+
+### Fonctionnalités
+
+- Drag & drop intuitif avec `@dnd-kit/core` et `@dnd-kit/sortable`
+- Mise à jour optimiste de l'UI pendant la sauvegarde
+- Rollback automatique en cas d'erreur
+- Indicateur visuel de sauvegarde en cours
+
+### Implémentation technique
+
+```tsx
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  KeyboardSensor,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+// Composant SortableCategory avec useSortable hook
+function SortableCategory({ category, onEdit, onDelete }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: category.id,
+  });
+  // ...
+}
+```
+
+### API Backend
+
+```
+PUT /api/v1/categories/reorder
+Body: { categoryIds: string[] }
+```
+
+- Vérifie les permissions (rôle `editor` minimum)
+- Mise à jour transactionnelle des positions
+- Log d'audit automatique
+
+---
+
+## Article Import
+
+**Localisation**: `/dashboard/settings` > "Import Articles"
+
+Importation en masse d'articles depuis un fichier JSON.
+
+### Format JSON attendu
+
+```json
+[
+  {
+    "title": "Mon Article",
+    "content": "Contenu en **Markdown**...",
+    "slug": "mon-article",
+    "categorySlug": "getting-started",
+    "published": true
+  }
+]
+```
+
+### Fonctionnalités
+
+- Validation côté client avec preview du nombre d'articles
+- Mapping automatique des catégories par slug
+- Feedback en temps réel (succès/échecs par article)
+- Gestion des doublons (slug déjà existant)
+
+### Interface
+
+```tsx
+// Modal d'import avec file input
+const handleImport = async () => {
+  const file = /* ... */;
+  const text = await file.text();
+  const articles = JSON.parse(text);
+
+  // Validation
+  if (!Array.isArray(articles)) {
+    throw new Error('Format invalide');
+  }
+
+  // Import via API
+  for (const article of articles) {
+    await articlesApi.create(article);
+  }
+};
+```
+
+---
+
+## Contact Form
+
+**Localisation**: `/contact`
+
+Formulaire de contact fonctionnel avec validation et rate limiting.
+
+### Champs
+
+| Champ | Type | Validation |
+|-------|------|------------|
+| `name` | text | 2-100 caractères |
+| `email` | email | Format email valide |
+| `subject` | text | 5-200 caractères |
+| `message` | textarea | 20-5000 caractères |
+| `category` | select | general, support, billing, partnership, other |
+
+### Fonctionnalités
+
+- Validation en temps réel avec messages d'erreur
+- Chargement des catégories depuis l'API
+- Rate limiting (3 soumissions/heure)
+- Confirmation avec numéro de ticket
+
+### Architecture
+
+```tsx
+// Client component avec form state
+'use client';
+
+const handleSubmit = async (e: FormEvent) => {
+  const response = await fetch('/api/v1/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, email, subject, message, category }),
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    // data.ticketId = "WB-XXXXXXX"
+  }
+};
 ```
 
 ---
@@ -426,6 +575,28 @@ Les composants utilisent le design system glassmorphic du projet:
 ---
 
 ## Changelog
+
+### v0.4.0 (2025-01-30)
+
+- **Category Drag & Drop**:
+  - Réorganisation des catégories par glisser-déposer avec `@dnd-kit`
+  - Mise à jour optimiste + rollback automatique en cas d'erreur
+  - Indicateur de sauvegarde en cours
+
+- **Article Import**:
+  - Modal d'import JSON fonctionnel dans les paramètres
+  - Validation et preview avant import
+  - Gestion des erreurs par article
+
+- **Contact Form**:
+  - Formulaire entièrement fonctionnel
+  - Validation côté client et serveur
+  - Catégories de contact dynamiques
+  - Numéro de ticket après soumission
+
+- **Settings Page**:
+  - Support upload logo (S3/R2 presigned URLs)
+  - Section export/import opérationnelle
 
 ### v0.3.0 (2025-01-29)
 
