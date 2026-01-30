@@ -155,3 +155,12 @@ export const auditLogsApi = {
   }) => api.get('/api/v1/audit-logs', { params }),
   getById: (logId: string) => api.get(`/api/v1/audit-logs/${logId}`),
 };
+
+export const permissionsApi = {
+  getAll: () => api.get('/api/v1/permissions'),
+  getMe: () => api.get('/api/v1/permissions/me'),
+  getByUserId: (userId: string) => api.get(`/api/v1/permissions/${userId}`),
+  update: (userId: string, overrides: Record<string, boolean | null>) =>
+    api.put(`/api/v1/permissions/${userId}`, { overrides }),
+  reset: (userId: string) => api.delete(`/api/v1/permissions/${userId}`),
+};

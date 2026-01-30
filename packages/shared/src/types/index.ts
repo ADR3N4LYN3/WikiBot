@@ -1,3 +1,6 @@
+// Re-export permission types
+export * from './permissions';
+
 // Discord-related types
 export interface DiscordUser {
   id: string;

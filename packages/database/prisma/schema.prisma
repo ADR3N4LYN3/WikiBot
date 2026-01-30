@@ -84,16 +84,34 @@ model ServerMember {
   serverId  String
   userId    String
   role      String   @default("viewer") // owner, admin, editor, viewer
+  source    String   @default("discord") // discord, wikibot, invite
+  invitedBy String? // userId of the person who invited this member
   joinedAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  server      Server            @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  user        User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  permissions MemberPermission?
 
   @@unique([serverId, userId])
   @@index([serverId])
   @@index([userId])
   @@map("server_members")
+}
+
+// Custom permission overrides for a member
+model MemberPermission {
+  id        String   @id @default(cuid())
+  memberId  String   @unique
+  // JSON object: { "articles:write": true, "settings:manage": false }
+  // true = explicitly granted, false = explicitly denied, missing = use role default
+  permissions Json   @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  member ServerMember @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  @@map("member_permissions")
 }
 
 // Audit log for tracking changes

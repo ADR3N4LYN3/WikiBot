@@ -13,6 +13,7 @@ import { contactRouter } from './routes/contact';
 import { exportRouter } from './routes/export';
 import { healthRouter } from './routes/health';
 import { membersRouter } from './routes/members';
+import { permissionsRouter } from './routes/permissions';
 import { publicRouter } from './routes/public';
 import { searchRouter } from './routes/search';
 import { serversRouter } from './routes/servers';
@@ -73,6 +74,7 @@ app.use('/api/v1/servers', serversRouter);
 app.use('/api/v1/settings', settingsRouter);
 app.use('/api/v1/stats', statsRouter);
 app.use('/api/v1/members', membersRouter);
+app.use('/api/v1/permissions', permissionsRouter);
 app.use('/api/v1/audit-logs', auditLogsRouter);
 app.use('/api/v1/contact', contactRouter);
 
