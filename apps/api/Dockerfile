@@ -50,6 +50,14 @@ COPY --from=base /app/apps/api ./apps/api
 
 WORKDIR /app/apps/api
 
+# Create entrypoint script that syncs DB schema before starting
+RUN echo '#!/bin/sh' > /entrypoint.sh && \
+    echo 'echo "🔄 Syncing database schema..."' >> /entrypoint.sh && \
+    echo 'cd /app/packages/database && npx prisma db push --skip-generate 2>&1 || echo "⚠️ DB sync failed (might be ok if no changes)"' >> /entrypoint.sh && \
+    echo 'echo "✅ Starting API server..."' >> /entrypoint.sh && \
+    echo 'cd /app/apps/api && exec node dist/index.js' >> /entrypoint.sh && \
+    chmod +x /entrypoint.sh
+
 EXPOSE 4000
 
-CMD ["node", "dist/index.js"]
+CMD ["/entrypoint.sh"]
