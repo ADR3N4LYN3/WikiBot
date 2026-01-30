@@ -14,6 +14,25 @@ client.on(Events.GuildCreate, async guild => {
     });
 
     console.log(`✅ Created database entry for ${guild.name}`);
+
+    // Add server owner as owner in WikiBot
+    try {
+      const owner = await guild.fetchOwner();
+      if (owner) {
+        await apiClient.post('/api/v1/members/initialize-owner', {
+          serverId: guild.id,
+          userId: owner.id,
+          userData: {
+            username: owner.user.username,
+            discriminator: owner.user.discriminator || '0',
+            avatar: owner.user.avatar,
+          },
+        });
+        console.log(`✅ Added server owner ${owner.user.username} as WikiBot owner`);
+      }
+    } catch (ownerError) {
+      console.error(`⚠️ Failed to add server owner (non-critical):`, ownerError);
+    }
   } catch (error) {
     console.error(`❌ Failed to create database entry:`, error);
   }

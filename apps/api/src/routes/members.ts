@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { requireAuth, requireServerId, AuthenticatedRequest } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
 import * as memberService from '../services/memberService';
+import * as permissionService from '../services/permissionService';
 
 export const membersRouter = Router();
 
@@ -27,8 +28,48 @@ const updateRoleSchema = z.object({
   role: z.enum(['admin', 'editor', 'viewer']),
 });
 
-// Apply auth and serverId middleware to all routes
+// Apply auth middleware (serverId not required for my-servers)
 membersRouter.use(requireAuth as (req: Request, res: Response, next: NextFunction) => void);
+
+// GET /members/my-servers - Get all servers where current user is a member
+// This endpoint does NOT require serverId - it returns servers for the authenticated user
+membersRouter.get('/my-servers', asyncHandler(async (req, res, _next) => {
+  const user = req.user;
+
+  if (!user || req.isBot) {
+    throw new AppError(403, 'Forbidden', 'User authentication required');
+  }
+
+  const servers = await permissionService.getUserServers(user.id);
+  res.json({ servers });
+}));
+
+// POST /members/initialize-owner - Bot-only endpoint to set server owner when bot joins
+// This endpoint does NOT require serverId header - it's passed in the body
+membersRouter.post('/initialize-owner', asyncHandler(async (req, res, _next) => {
+  // Only bot can initialize owner
+  if (!req.isBot) {
+    throw new AppError(403, 'Forbidden', 'Only bot can initialize server owner');
+  }
+
+  const { serverId, userId, userData } = req.body;
+
+  if (!serverId || !userId) {
+    throw new AppError(400, 'Bad Request', 'serverId and userId are required');
+  }
+
+  // Use the existing ensureServerOwner function from memberService
+  await memberService.ensureServerOwner(serverId, userId, userData);
+
+  console.log(`✅ Server owner initialized: ${userId} for server ${serverId}`);
+
+  res.status(201).json({
+    success: true,
+    message: 'Server owner initialized',
+  });
+}));
+
+// Apply serverId middleware for remaining routes
 membersRouter.use(requireServerId);
 
 // Get all members of a server
