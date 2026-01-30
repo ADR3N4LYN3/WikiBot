@@ -43,8 +43,12 @@ model ServerSettings {
   maxSearchesPerMonth Int @default(1000)
 
   // Features toggles
-  aiSearchEnabled Boolean @default(false)
-  publicWebview   Boolean @default(true)
+  aiSearchEnabled      Boolean @default(false)
+  publicWebview        Boolean @default(true)
+  analyticsEnabled     Boolean @default(true)
+  searchLoggingEnabled Boolean @default(true)
+  moderationEnabled    Boolean @default(false)
+  fastIndexingEnabled  Boolean @default(false)
 
   // Stripe integration
   stripeCustomerId     String?

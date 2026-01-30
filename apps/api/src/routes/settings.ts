@@ -29,6 +29,11 @@ const updateSettingsSchema = z.object({
     .optional(),
   logoUrl: z.string().url().optional().nullable(),
   publicWebview: z.boolean().optional(),
+  aiSearchEnabled: z.boolean().optional(),
+  analyticsEnabled: z.boolean().optional(),
+  searchLoggingEnabled: z.boolean().optional(),
+  moderationEnabled: z.boolean().optional(),
+  fastIndexingEnabled: z.boolean().optional(),
 });
 
 const uploadUrlSchema = z.object({
@@ -59,6 +64,10 @@ settingsRouter.get('/', asyncHandler(async (req, res, _next) => {
     logoUrl: settings.logoUrl,
     publicWebview: settings.publicWebview,
     aiSearchEnabled: settings.aiSearchEnabled,
+    analyticsEnabled: settings.analyticsEnabled,
+    searchLoggingEnabled: settings.searchLoggingEnabled,
+    moderationEnabled: settings.moderationEnabled,
+    fastIndexingEnabled: settings.fastIndexingEnabled,
     maxArticles: settings.maxArticles,
     maxSearchesPerMonth: settings.maxSearchesPerMonth,
   });
@@ -87,7 +96,16 @@ settingsRouter.put('/', asyncHandler(async (req, res, _next) => {
     throw new AppError(400, 'Invalid request', parsed.error.errors);
   }
 
-  const { brandColor, logoUrl, publicWebview } = parsed.data;
+  const {
+    brandColor,
+    logoUrl,
+    publicWebview,
+    aiSearchEnabled,
+    analyticsEnabled,
+    searchLoggingEnabled,
+    moderationEnabled,
+    fastIndexingEnabled,
+  } = parsed.data;
 
   // Check if server exists and has premium for logo
   const server = await prisma.server.findUnique({
@@ -110,12 +128,22 @@ settingsRouter.put('/', asyncHandler(async (req, res, _next) => {
       ...(brandColor && { brandColor }),
       ...(logoUrl !== undefined && { logoUrl }),
       ...(publicWebview !== undefined && { publicWebview }),
+      ...(aiSearchEnabled !== undefined && { aiSearchEnabled }),
+      ...(analyticsEnabled !== undefined && { analyticsEnabled }),
+      ...(searchLoggingEnabled !== undefined && { searchLoggingEnabled }),
+      ...(moderationEnabled !== undefined && { moderationEnabled }),
+      ...(fastIndexingEnabled !== undefined && { fastIndexingEnabled }),
     },
     create: {
       serverId,
       ...(brandColor && { brandColor }),
       ...(logoUrl !== undefined && { logoUrl }),
       ...(publicWebview !== undefined && { publicWebview }),
+      ...(aiSearchEnabled !== undefined && { aiSearchEnabled }),
+      ...(analyticsEnabled !== undefined && { analyticsEnabled }),
+      ...(searchLoggingEnabled !== undefined && { searchLoggingEnabled }),
+      ...(moderationEnabled !== undefined && { moderationEnabled }),
+      ...(fastIndexingEnabled !== undefined && { fastIndexingEnabled }),
     },
   });
 
@@ -130,6 +158,21 @@ settingsRouter.put('/', asyncHandler(async (req, res, _next) => {
   if (publicWebview !== undefined && publicWebview !== oldSettings?.publicWebview) {
     changes.publicWebview = { old: oldSettings?.publicWebview, new: publicWebview };
   }
+  if (aiSearchEnabled !== undefined && aiSearchEnabled !== oldSettings?.aiSearchEnabled) {
+    changes.aiSearchEnabled = { old: oldSettings?.aiSearchEnabled, new: aiSearchEnabled };
+  }
+  if (analyticsEnabled !== undefined && analyticsEnabled !== oldSettings?.analyticsEnabled) {
+    changes.analyticsEnabled = { old: oldSettings?.analyticsEnabled, new: analyticsEnabled };
+  }
+  if (searchLoggingEnabled !== undefined && searchLoggingEnabled !== oldSettings?.searchLoggingEnabled) {
+    changes.searchLoggingEnabled = { old: oldSettings?.searchLoggingEnabled, new: searchLoggingEnabled };
+  }
+  if (moderationEnabled !== undefined && moderationEnabled !== oldSettings?.moderationEnabled) {
+    changes.moderationEnabled = { old: oldSettings?.moderationEnabled, new: moderationEnabled };
+  }
+  if (fastIndexingEnabled !== undefined && fastIndexingEnabled !== oldSettings?.fastIndexingEnabled) {
+    changes.fastIndexingEnabled = { old: oldSettings?.fastIndexingEnabled, new: fastIndexingEnabled };
+  }
 
   if (Object.keys(changes).length > 0) {
     await auditLogService.logSettingsChange(serverId, user.id, changes, {
@@ -143,6 +186,10 @@ settingsRouter.put('/', asyncHandler(async (req, res, _next) => {
     logoUrl: settings.logoUrl,
     publicWebview: settings.publicWebview,
     aiSearchEnabled: settings.aiSearchEnabled,
+    analyticsEnabled: settings.analyticsEnabled,
+    searchLoggingEnabled: settings.searchLoggingEnabled,
+    moderationEnabled: settings.moderationEnabled,
+    fastIndexingEnabled: settings.fastIndexingEnabled,
   });
 }));
 

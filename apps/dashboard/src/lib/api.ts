@@ -100,6 +100,11 @@ export const settingsApi = {
     brandColor?: string;
     logoUrl?: string | null;
     publicWebview?: boolean;
+    aiSearchEnabled?: boolean;
+    analyticsEnabled?: boolean;
+    searchLoggingEnabled?: boolean;
+    moderationEnabled?: boolean;
+    fastIndexingEnabled?: boolean;
   }) => api.put('/api/v1/settings', data),
   getLogoUploadUrl: (filename: string, contentType: string) =>
     api.post('/api/v1/settings/logo/upload-url', { filename, contentType }),
