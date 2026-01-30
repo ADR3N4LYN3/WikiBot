@@ -6,6 +6,8 @@ Documentation des fonctionnalités du dashboard WikiBot.
 
 - [Quick Actions Bar](#quick-actions-bar)
 - [Page Modules](#page-modules)
+- [Page Members](#page-members)
+- [Page Audit Logs](#page-audit-logs)
 - [Command Palette](#command-palette)
 - [Onboarding Wizard](#onboarding-wizard)
 - [Category Drag & Drop](#category-drag--drop)
@@ -80,6 +82,160 @@ import { ModuleCard } from '@/components/ModuleCard';
   onToggle={(id, enabled) => updateModule(id, enabled)}
 />
 ```
+
+---
+
+## Page Members
+
+**Localisation**: `/dashboard/members`
+
+Page de gestion des membres du serveur avec contrôle des rôles et permissions.
+
+### Fonctionnalités
+
+| Fonctionnalité | Description | Permission requise |
+|----------------|-------------|-------------------|
+| **Liste des membres** | Affichage avec avatars Discord et rôles | Viewer+ |
+| **Ajouter un membre** | Ajout par Discord User ID | Admin+ |
+| **Modifier le rôle** | Changer le rôle d'un membre | Admin+ (Owner pour admin) |
+| **Supprimer un membre** | Retirer un membre du serveur | Admin+ |
+| **Transfert de propriété** | Transférer ownership à un admin | Owner uniquement |
+
+### Hiérarchie des rôles
+
+| Rôle | Icône | Couleur | Permissions |
+|------|-------|---------|-------------|
+| **Owner** | Crown | Jaune | Toutes les actions + transfert |
+| **Admin** | Shield | Rouge | Gérer membres, paramètres, catégories |
+| **Editor** | UserCog | Bleu | Créer/modifier articles |
+| **Viewer** | Eye | Gris | Lecture seule |
+
+### Composant
+
+```tsx
+// Page principale
+import { membersApi } from '@/lib/api';
+import useSWR from 'swr';
+
+const { data: members, mutate } = useSWR('members', () =>
+  membersApi.getAll().then((res) => res.data)
+);
+
+// Ajouter un membre
+await membersApi.add({
+  userId: '123456789012345678',
+  role: 'editor',
+});
+
+// Changer le rôle
+await membersApi.updateRole(userId, 'admin');
+
+// Transférer la propriété
+await membersApi.transferOwnership(newOwnerId);
+```
+
+### API Endpoints utilisés
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/api/v1/members` | Liste des membres |
+| GET | `/api/v1/members/me` | Rôle de l'utilisateur actuel |
+| POST | `/api/v1/members` | Ajouter un membre |
+| PUT | `/api/v1/members/:userId/role` | Modifier le rôle |
+| DELETE | `/api/v1/members/:userId` | Supprimer un membre |
+| POST | `/api/v1/members/transfer-ownership` | Transférer ownership |
+
+---
+
+## Page Audit Logs
+
+**Localisation**: `/dashboard/audit-logs`
+
+Page de consultation des logs d'audit pour tracer toutes les actions effectuées sur le serveur.
+
+### Fonctionnalités
+
+| Fonctionnalité | Description |
+|----------------|-------------|
+| **Liste paginée** | Affichage des 50 derniers logs avec pagination |
+| **Filtrage par type** | Articles, Catégories, Settings, Members |
+| **Détails expandables** | JSON des changements (old/new values) |
+| **Refresh manuel** | Bouton pour rafraîchir les données |
+
+### Types d'entités
+
+| Type | Icône | Couleur | Exemple d'actions |
+|------|-------|---------|-------------------|
+| **Article** | FileText | Bleu | create, update, delete |
+| **Category** | FolderOpen | Vert | create, update, delete, reorder |
+| **Settings** | Settings | Violet | settings_change |
+| **Member** | Users | Orange | member_add, member_remove, role_change |
+
+### Composant
+
+```tsx
+import { auditLogsApi } from '@/lib/api';
+import useSWR from 'swr';
+
+// Récupérer les logs avec filtres
+const { data } = useSWR(['audit-logs', entityType, limit, offset], () =>
+  auditLogsApi.getAll({
+    limit: 50,
+    offset: 0,
+    entityType: 'article', // optionnel
+  }).then((res) => res.data)
+);
+
+// Structure de la réponse
+interface AuditLogsResponse {
+  logs: AuditLog[];
+  total: number;
+  limit: number;
+  offset: number;
+}
+```
+
+### Structure d'un log
+
+```typescript
+interface AuditLog {
+  id: string;
+  serverId: string;
+  actorId: string;
+  action: string;         // create, update, delete, etc.
+  entityType: string;     // article, category, settings, member
+  entityId?: string;
+  details?: string;       // JSON avec old/new values
+  ipAddress?: string;
+  userAgent?: string;
+  createdAt: string;
+  actor: {
+    id: string;
+    username: string;
+    discriminator: string;
+    avatar?: string;
+  };
+}
+```
+
+### API Endpoints utilisés
+
+| Méthode | Endpoint | Description |
+|---------|----------|-------------|
+| GET | `/api/v1/audit-logs` | Liste paginée avec filtres |
+| GET | `/api/v1/audit-logs/:logId` | Détail d'un log |
+
+### Query Parameters
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `limit` | number | Nombre de résultats (défaut: 50) |
+| `offset` | number | Décalage pour pagination |
+| `entityType` | string | Filtrer par type d'entité |
+| `action` | string | Filtrer par action |
+| `actorId` | string | Filtrer par utilisateur |
+| `startDate` | string | Date de début (ISO) |
+| `endDate` | string | Date de fin (ISO) |
 
 ---
 
@@ -527,6 +683,8 @@ api.interceptors.request.use(async (config) => {
 |---------|-----------|-------------|
 | `articlesApi` | GET, POST, PUT, DELETE `/api/v1/articles` | Gestion des articles |
 | `categoriesApi` | GET, POST, PUT, DELETE `/api/v1/categories` | Gestion des catégories |
+| `membersApi` | GET, POST, PUT, DELETE `/api/v1/members` | Gestion des membres |
+| `auditLogsApi` | GET `/api/v1/audit-logs` | Consultation des logs d'audit |
 | `analyticsApi` | GET `/api/v1/analytics/*` | Statistiques |
 | `searchApi` | GET `/api/v1/search` | Recherche |
 | `settingsApi` | GET, PUT `/api/v1/settings` | Configuration |
@@ -575,6 +733,30 @@ Les composants utilisent le design system glassmorphic du projet:
 ---
 
 ## Changelog
+
+### v0.5.0 (2026-01-30)
+
+- **Page Members** (`/dashboard/members`):
+  - Liste des membres avec avatars Discord et badges de rôles colorés
+  - Ajout de membre par Discord User ID
+  - Modification des rôles (Owner/Admin/Editor/Viewer)
+  - Suppression de membres
+  - Transfert de propriété du serveur
+  - Vérification des permissions en temps réel
+
+- **Page Audit Logs** (`/dashboard/audit-logs`):
+  - Liste paginée des logs d'audit (50 par page)
+  - Filtrage par type d'entité (Article, Category, Settings, Member)
+  - Détails JSON expandables pour voir les changements
+  - Refresh manuel des données
+  - Icônes et couleurs distinctes par type d'action
+
+- **API Client**:
+  - Nouveau service `membersApi` avec 7 méthodes (getAll, getMe, getById, add, updateRole, remove, transferOwnership)
+  - Nouveau service `auditLogsApi` avec 2 méthodes (getAll, getById)
+
+- **Navigation**:
+  - Ajout des liens "Members" et "Audit Logs" dans la sidebar
 
 ### v0.4.0 (2025-01-30)
 

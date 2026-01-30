@@ -241,18 +241,22 @@ await auditLogService.logArticleAction(
 
 | Méthode | Endpoint | Description | Auth |
 |---------|----------|-------------|------|
-| GET | `/api/v1/members` | Liste des membres | Admin+ |
+| GET | `/api/v1/members` | Liste des membres | Viewer+ |
+| GET | `/api/v1/members/me` | Rôle de l'utilisateur actuel | User |
+| GET | `/api/v1/members/:userId` | Détail d'un membre | Viewer+ |
 | POST | `/api/v1/members` | Ajouter un membre | Admin+ |
-| PUT | `/api/v1/members/:userId` | Modifier le rôle | Admin+ |
+| PUT | `/api/v1/members/:userId/role` | Modifier le rôle | Admin+ |
 | DELETE | `/api/v1/members/:userId` | Retirer un membre | Admin+ |
-| POST | `/api/v1/members/transfer` | Transférer la propriété | Owner |
+| POST | `/api/v1/members/transfer-ownership` | Transférer la propriété | Owner |
+
+**Dashboard**: Page `/dashboard/members` disponible pour gérer les membres visuellement.
 
 ### Audit Logs
 
 | Méthode | Endpoint | Description | Auth |
 |---------|----------|-------------|------|
 | GET | `/api/v1/audit-logs` | Liste des logs | Admin+ |
-| GET | `/api/v1/audit-logs/:id` | Détail d'un log | Admin+ |
+| GET | `/api/v1/audit-logs/:logId` | Détail d'un log | Admin+ |
 
 **Query params**:
 - `limit` (défaut: 50)
@@ -261,6 +265,8 @@ await auditLogService.logArticleAction(
 - `action`: nom de l'action
 - `actorId`: ID de l'utilisateur
 - `startDate`, `endDate`: filtres de date
+
+**Dashboard**: Page `/dashboard/audit-logs` disponible pour consulter les logs visuellement avec filtres et pagination.
 
 ### Contact
 
@@ -388,6 +394,17 @@ STRIPE_WEBHOOK_SECRET="whsec_xxx"
 ---
 
 ## Changelog
+
+### v0.5.0 (2026-01-30)
+
+- **Dashboard Integration**:
+  - Page Members frontend connectée aux endpoints `/api/v1/members`
+  - Page Audit Logs frontend connectée aux endpoints `/api/v1/audit-logs`
+  - Documentation des endpoints mise à jour avec références au dashboard
+
+- **Members API**:
+  - Nouvel endpoint `GET /api/v1/members/me` pour récupérer le rôle de l'utilisateur actuel
+  - Clarification des permissions par endpoint
 
 ### v0.4.0 (2025-01-30)
 
