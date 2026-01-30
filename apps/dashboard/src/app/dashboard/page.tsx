@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import useSWR from 'swr';
+import { useSession } from 'next-auth/react';
 import { BookOpen, Search, Eye, FolderOpen, TrendingUp, ArrowUpRight } from 'lucide-react';
 import {
   XAxis,
@@ -42,6 +43,7 @@ const itemVariants = {
 const ONBOARDING_KEY = 'wikibot-onboarding-completed';
 
 export default function DashboardPage() {
+  const { data: session } = useSession();
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   const { data: overview, mutate: mutateOverview } = useSWR('analytics-overview', () =>
@@ -141,7 +143,7 @@ export default function DashboardPage() {
         {/* Header */}
       <motion.div variants={itemVariants}>
         <h1 className="text-3xl font-bold">
-          Welcome back, <GradientText>Admin</GradientText>
+          Welcome back, <GradientText>{session?.user?.name || 'Admin'}</GradientText>
         </h1>
         <p className="text-muted-foreground mt-1">
           Here&apos;s what&apos;s happening with your wiki today
