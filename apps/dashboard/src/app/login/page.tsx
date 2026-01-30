@@ -1,7 +1,8 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
-import { useState } from 'react';
+import { signIn, useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, BookOpen, Loader2, Sparkles } from 'lucide-react';
 import Link from 'next/link';
@@ -13,6 +14,15 @@ import { GradientText } from '@/components/ui/GradientText';
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const { status } = useSession();
+  const router = useRouter();
+
+  // Redirect to dashboard if already authenticated (client-side fallback)
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.replace('/dashboard');
+    }
+  }, [status, router]);
 
   const handleLogin = async () => {
     setIsLoading(true);
