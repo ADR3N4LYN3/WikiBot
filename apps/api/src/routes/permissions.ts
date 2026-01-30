@@ -2,19 +2,13 @@ import { PERMISSIONS, Permission, isValidPermission } from '@wikibot/shared';
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 
-import { requireAuth, requireServerId, AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth, requireServerId } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
 import { requirePermission } from '../middleware/requirePermission';
 import * as permissionService from '../services/permissionService';
+import { asyncHandler } from '../utils/asyncHandler';
 
 export const permissionsRouter = Router();
-
-// Wrapper to handle async middleware with proper typing
-const asyncHandler = (fn: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req as AuthenticatedRequest, res, next)).catch(next);
-  };
-};
 
 // Validation schemas
 const updatePermissionsSchema = z.object({

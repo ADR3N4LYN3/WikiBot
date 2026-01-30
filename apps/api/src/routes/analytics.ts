@@ -1,7 +1,9 @@
 import { Router } from 'express';
 
 import { requireAuth, requireServerId } from '../middleware/auth';
+import { AppError } from '../middleware/errorHandler';
 import * as analyticsService from '../services/analyticsService';
+import * as articleAnalyticsService from '../services/articleAnalyticsService';
 
 export const analyticsRouter = Router();
 
@@ -58,6 +60,46 @@ analyticsRouter.get('/activity', async (req, res, next) => {
     const activity = await analyticsService.getActivity(serverId, Number(days));
 
     res.json(activity);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get analytics for a specific article
+analyticsRouter.get('/articles/:slug', async (req, res, next) => {
+  try {
+    const serverId = req.serverId!;
+    const { slug } = req.params;
+    const { days = 30 } = req.query;
+
+    const analytics = await articleAnalyticsService.getArticleAnalytics(
+      serverId,
+      slug,
+      Number(days)
+    );
+
+    if (!analytics) {
+      throw new AppError(404, 'Article not found');
+    }
+
+    res.json(analytics);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get server-wide analytics summary
+analyticsRouter.get('/summary', async (req, res, next) => {
+  try {
+    const serverId = req.serverId!;
+    const { days = 30 } = req.query;
+
+    const summary = await articleAnalyticsService.getServerAnalytics(
+      serverId,
+      Number(days)
+    );
+
+    res.json(summary);
   } catch (error) {
     next(error);
   }

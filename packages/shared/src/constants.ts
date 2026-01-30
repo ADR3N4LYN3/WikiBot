@@ -1,8 +1,11 @@
 // Subscription tiers
 export enum SubscriptionTier {
   FREE = 'free',
-  PREMIUM = 'premium',
+  STARTER = 'starter',
   PRO = 'pro',
+  ENTERPRISE = 'enterprise',
+  // Legacy aliases for backwards compatibility
+  PREMIUM = 'starter',
 }
 
 // Alias for backwards compatibility
@@ -11,39 +14,71 @@ export type PremiumTier = SubscriptionTier;
 // Tier limits configuration
 export const TIER_LIMITS = {
   [SubscriptionTier.FREE]: {
-    maxArticles: 50,
-    maxSearchesPerMonth: 1000,
+    maxArticles: 25,
+    maxSearchesPerMonth: 500,
     maxCategories: 3,
     maxAdmins: 1,
     aiSearchEnabled: false,
+    ragEnabled: false,
     customBranding: false,
     exportImport: false,
     advancedAnalytics: false,
     apiAccess: false,
+    ssoEnabled: false,
+    price: 0,
   },
-  [SubscriptionTier.PREMIUM]: {
+  [SubscriptionTier.STARTER]: {
+    maxArticles: 200,
+    maxSearchesPerMonth: 5000,
+    maxCategories: 10,
+    maxAdmins: 3,
+    aiSearchEnabled: true,
+    ragEnabled: false,
+    customBranding: false,
+    exportImport: true,
+    advancedAnalytics: false,
+    apiAccess: false,
+    ssoEnabled: false,
+    price: 9,
+  },
+  [SubscriptionTier.PRO]: {
     maxArticles: -1, // unlimited
     maxSearchesPerMonth: -1,
     maxCategories: -1,
-    maxAdmins: 5,
+    maxAdmins: -1,
     aiSearchEnabled: true,
+    ragEnabled: true,
     customBranding: true,
     exportImport: true,
     advancedAnalytics: true,
-    apiAccess: false,
+    apiAccess: true,
+    ssoEnabled: false,
+    price: 25,
   },
-  [SubscriptionTier.PRO]: {
+  [SubscriptionTier.ENTERPRISE]: {
     maxArticles: -1,
     maxSearchesPerMonth: -1,
     maxCategories: -1,
     maxAdmins: -1,
     aiSearchEnabled: true,
+    ragEnabled: true,
     customBranding: true,
     exportImport: true,
     advancedAnalytics: true,
     apiAccess: true,
+    ssoEnabled: true,
+    price: 99,
   },
 } as const;
+
+// Get tier limits with fallback for legacy 'premium' value
+export function getTierLimits(tier: string) {
+  // Handle legacy 'premium' tier
+  if (tier === 'premium') {
+    return TIER_LIMITS[SubscriptionTier.STARTER];
+  }
+  return TIER_LIMITS[tier as SubscriptionTier] || TIER_LIMITS[SubscriptionTier.FREE];
+}
 
 // Discord colors
 export const DISCORD_COLORS = {

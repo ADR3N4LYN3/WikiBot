@@ -11,33 +11,42 @@ import {
 } from '@wikibot/shared';
 
 import { AppError } from '../middleware/errorHandler';
+import { cacheable, cacheDelete, CacheKeys, CacheTTL } from '../utils/redis';
 
 /**
- * Get the effective permissions for a member
+ * Get the effective permissions for a member (with caching)
  */
 export async function getMemberPermissions(
   serverId: string,
   userId: string
 ): Promise<EffectivePermissions | null> {
-  const member = await prisma.serverMember.findUnique({
-    where: { serverId_userId: { serverId, userId } },
-    include: { permissions: true },
-  });
+  const cacheKey = CacheKeys.permissions(serverId, userId);
 
-  if (!member) return null;
+  return cacheable(
+    cacheKey,
+    async () => {
+      const member = await prisma.serverMember.findUnique({
+        where: { serverId_userId: { serverId, userId } },
+        include: { permissions: true },
+      });
 
-  const role = member.role as MemberRole;
-  const overrides = (member.permissions?.permissions as PermissionOverrides) || {};
-  const permissions = calculateEffectivePermissions(role, overrides);
+      if (!member) return null;
 
-  const hasOverrides = Object.keys(overrides).length > 0;
+      const role = member.role as MemberRole;
+      const overrides = (member.permissions?.permissions as PermissionOverrides) || {};
+      const permissions = calculateEffectivePermissions(role, overrides);
 
-  return {
-    permissions,
-    role,
-    source: hasOverrides ? 'mixed' : 'role',
-    overrides,
-  };
+      const hasOverrides = Object.keys(overrides).length > 0;
+
+      return {
+        permissions,
+        role,
+        source: hasOverrides ? 'mixed' : 'role',
+        overrides,
+      };
+    },
+    CacheTTL.PERMISSIONS
+  );
 }
 
 /**
@@ -163,7 +172,10 @@ export async function updateMemberPermissions(
     },
   });
 
-  // Return updated permissions
+  // Invalidate cache
+  await cacheDelete(CacheKeys.permissions(serverId, targetUserId));
+
+  // Return updated permissions (will re-cache)
   const updated = await getMemberPermissions(serverId, targetUserId);
   if (!updated) {
     throw new AppError(500, 'Internal Error', 'Failed to retrieve updated permissions');
@@ -198,33 +210,44 @@ export async function resetMemberPermissions(
   await prisma.memberPermission.deleteMany({
     where: { memberId: targetMember.id },
   });
+
+  // Invalidate cache
+  await cacheDelete(CacheKeys.permissions(serverId, targetUserId));
 }
 
 /**
  * Get all servers where a user is a member (for dashboard access)
  */
 export async function getUserServers(userId: string) {
-  const memberships = await prisma.serverMember.findMany({
-    where: { userId },
-    include: {
-      server: {
-        select: {
-          id: true,
-          name: true,
-          premiumTier: true,
-        },
-      },
-    },
-  });
+  const cacheKey = CacheKeys.memberServers(userId);
 
-  return memberships.map((m) => ({
-    id: m.server.id,
-    name: m.server.name,
-    role: m.role,
-    source: m.source,
-    premiumTier: m.server.premiumTier,
-    joinedAt: m.joinedAt,
-  }));
+  return cacheable(
+    cacheKey,
+    async () => {
+      const memberships = await prisma.serverMember.findMany({
+        where: { userId },
+        include: {
+          server: {
+            select: {
+              id: true,
+              name: true,
+              premiumTier: true,
+            },
+          },
+        },
+      });
+
+      return memberships.map((m) => ({
+        id: m.server.id,
+        name: m.server.name,
+        role: m.role,
+        source: m.source,
+        premiumTier: m.server.premiumTier,
+        joinedAt: m.joinedAt,
+      }));
+    },
+    CacheTTL.MEMBER_SERVERS
+  );
 }
 
 /**

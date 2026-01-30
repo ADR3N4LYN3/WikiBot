@@ -176,16 +176,52 @@ model Article {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  server   Server        @relation(fields: [serverId], references: [id], onDelete: Cascade)
-  category Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  author   User          @relation("ArticleAuthor", fields: [authorId], references: [id])
-  edits    ArticleEdit[]
-  searches SearchLog[]
+  server        Server             @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  category      Category?          @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  author        User               @relation("ArticleAuthor", fields: [authorId], references: [id])
+  edits         ArticleEdit[]
+  searches      SearchLog[]
+  outgoingLinks Backlink[]         @relation("BacklinkSource")
+  incomingLinks Backlink[]         @relation("BacklinkTarget")
+  analytics     ArticleAnalytics[]
 
   @@unique([serverId, slug])
   @@index([serverId, categoryId])
   @@index([serverId, published])
   @@map("articles")
+}
+
+// Backlink between articles (knowledge graph)
+model Backlink {
+  id              String   @id @default(cuid())
+  sourceArticleId String
+  targetArticleId String
+  createdAt       DateTime @default(now())
+
+  sourceArticle Article @relation("BacklinkSource", fields: [sourceArticleId], references: [id], onDelete: Cascade)
+  targetArticle Article @relation("BacklinkTarget", fields: [targetArticleId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceArticleId, targetArticleId])
+  @@index([targetArticleId])
+  @@map("backlinks")
+}
+
+// Per-article analytics (daily aggregates)
+model ArticleAnalytics {
+  id           String   @id @default(cuid())
+  articleId    String
+  date         DateTime @db.Date
+  views        Int      @default(0)
+  uniqueViews  Int      @default(0)
+  avgTimeSpent Int      @default(0) // in seconds
+  helpful      Int      @default(0)
+  notHelpful   Int      @default(0)
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, date])
+  @@index([articleId, date])
+  @@map("article_analytics")
 }
 
 // Article version history

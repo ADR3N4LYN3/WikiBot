@@ -1,5 +1,5 @@
 import { prisma } from '@wikibot/database';
-import { TIER_LIMITS, SubscriptionTier } from '@wikibot/shared';
+import { getTierLimits, SubscriptionTier } from '@wikibot/shared';
 import Stripe from 'stripe';
 
 // Initialize Stripe
@@ -8,9 +8,12 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 });
 
 // Price IDs from Stripe Dashboard
-const PRICE_IDS = {
-  premium: process.env.STRIPE_PREMIUM_PRICE_ID || 'price_premium',
+const PRICE_IDS: Record<string, string> = {
+  starter: process.env.STRIPE_STARTER_PRICE_ID || 'price_starter',
   pro: process.env.STRIPE_PRO_PRICE_ID || 'price_pro',
+  enterprise: process.env.STRIPE_ENTERPRISE_PRICE_ID || 'price_enterprise',
+  // Legacy alias
+  premium: process.env.STRIPE_STARTER_PRICE_ID || 'price_starter',
 };
 
 /**
@@ -59,13 +62,17 @@ export async function getOrCreateCustomer(
 export async function createCheckoutSession(
   serverId: string,
   serverName: string,
-  tier: 'premium' | 'pro',
+  tier: 'starter' | 'pro' | 'enterprise',
   successUrl: string,
   cancelUrl: string,
   email?: string
 ): Promise<string> {
   const customerId = await getOrCreateCustomer(serverId, serverName, email);
   const priceId = PRICE_IDS[tier];
+
+  if (!priceId) {
+    throw new Error(`Invalid tier: ${tier}`);
+  }
 
   const session = await stripe.checkout.sessions.create({
     customer: customerId,
@@ -201,7 +208,7 @@ export async function updateServerTier(
   tier: SubscriptionTier,
   subscriptionId?: string
 ): Promise<void> {
-  const limits = TIER_LIMITS[tier];
+  const limits = getTierLimits(tier);
 
   await prisma.$transaction([
     prisma.server.update({
@@ -250,7 +257,7 @@ export async function checkArticleLimit(serverId: string): Promise<{
     }),
   ]);
 
-  const maxArticles = settings?.maxArticles || TIER_LIMITS.free.maxArticles;
+  const maxArticles = settings?.maxArticles || getTierLimits('free').maxArticles;
 
   return {
     allowed: articleCount < maxArticles,
@@ -285,7 +292,7 @@ export async function checkSearchLimit(serverId: string): Promise<{
   ]);
 
   const maxSearches =
-    settings?.maxSearchesPerMonth || TIER_LIMITS.free.maxSearchesPerMonth;
+    settings?.maxSearchesPerMonth || getTierLimits('free').maxSearchesPerMonth;
 
   return {
     allowed: searchCount < maxSearches,

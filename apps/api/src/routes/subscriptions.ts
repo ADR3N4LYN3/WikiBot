@@ -16,9 +16,12 @@ export const subscriptionsRouter = Router();
 // Apply serverId extraction to all routes
 subscriptionsRouter.use(extractServerId);
 
-// Validation schema
+// Validation schema - supports new tier names and legacy 'premium' alias
 const checkoutSchema = z.object({
-  tier: z.enum(['premium', 'pro']),
+  tier: z.enum(['starter', 'pro', 'enterprise', 'premium']).transform((val) => {
+    // Map legacy 'premium' to 'starter'
+    return val === 'premium' ? 'starter' : val;
+  }) as z.ZodType<'starter' | 'pro' | 'enterprise'>,
   successUrl: z.string().url(),
   cancelUrl: z.string().url(),
   email: z.string().email().optional(),

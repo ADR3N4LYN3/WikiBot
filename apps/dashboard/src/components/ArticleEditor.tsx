@@ -4,6 +4,7 @@ import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
 import Link from '@tiptap/extension-link';
+import Image from '@tiptap/extension-image';
 import {
   Bold,
   Italic,
@@ -17,9 +18,11 @@ import {
   Link as LinkIcon,
   Undo,
   Redo,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { SlashCommands } from './editor/SlashCommands';
 
 interface ArticleEditorProps {
   content: string;
@@ -35,11 +38,17 @@ export function ArticleEditor({ content, onChange }: ArticleEditorProps) {
         },
       }),
       Placeholder.configure({
-        placeholder: 'Start writing your article...',
+        placeholder: 'Start writing your article... Type "/" for commands',
       }),
       Link.configure({
         openOnClick: false,
       }),
+      Image.configure({
+        HTMLAttributes: {
+          class: 'rounded-lg max-w-full',
+        },
+      }),
+      SlashCommands,
     ],
     content,
     onUpdate: ({ editor }) => {
@@ -76,6 +85,13 @@ export function ArticleEditor({ content, onChange }: ArticleEditorProps) {
     const url = prompt('Enter URL:');
     if (url) {
       editor.chain().focus().setLink({ href: url }).run();
+    }
+  };
+
+  const addImage = () => {
+    const url = prompt('Enter image URL:');
+    if (url) {
+      editor.chain().focus().setImage({ src: url }).run();
     }
   };
 
@@ -148,6 +164,9 @@ export function ArticleEditor({ content, onChange }: ArticleEditorProps) {
 
         <ToolbarButton onClick={addLink} active={editor.isActive('link')}>
           <LinkIcon className="w-4 h-4" />
+        </ToolbarButton>
+        <ToolbarButton onClick={addImage}>
+          <ImageIcon className="w-4 h-4" />
         </ToolbarButton>
 
         <div className="flex-1" />

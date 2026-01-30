@@ -2,20 +2,14 @@ import { prisma } from '@wikibot/database';
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 
-import { requireAuth, extractServerId, AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth, extractServerId } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
 import * as auditLogService from '../services/auditLogService';
 import * as memberService from '../services/memberService';
 import * as uploadService from '../services/uploadService';
+import { asyncHandler } from '../utils/asyncHandler';
 
 export const settingsRouter = Router();
-
-// Wrapper to handle async middleware with proper typing
-const asyncHandler = (fn: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req as AuthenticatedRequest, res, next)).catch(next);
-  };
-};
 
 // Apply auth and serverId extraction to all routes
 settingsRouter.use(requireAuth as (req: Request, res: Response, next: NextFunction) => void);

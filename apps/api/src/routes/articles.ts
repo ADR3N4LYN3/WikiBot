@@ -1,18 +1,14 @@
 import { articleCreateSchema, articleUpdateSchema } from '@wikibot/shared';
 import { Router, Request, Response, NextFunction } from 'express';
 
-import { requireAuth, requireServerId, AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth, requireServerId } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
 import * as articleService from '../services/articleService';
+import * as backlinkService from '../services/backlinkService';
+import * as subscriptionService from '../services/subscriptionService';
+import { asyncHandler } from '../utils/asyncHandler';
 
 export const articlesRouter = Router();
-
-// Wrapper to handle async middleware with proper typing
-const asyncHandler = (fn: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req as AuthenticatedRequest, res, next)).catch(next);
-  };
-};
 
 // Apply auth and serverId middleware to all routes
 articlesRouter.use(requireAuth as (req: Request, res: Response, next: NextFunction) => void);
@@ -60,6 +56,16 @@ articlesRouter.post('/', asyncHandler(async (req, res, _next) => {
   // Require authenticated user (not bot) for creating articles
   if (!user || req.isBot) {
     throw new AppError(403, 'Forbidden', 'User authentication required to create articles');
+  }
+
+  // Check article limit for subscription tier
+  const limit = await subscriptionService.checkArticleLimit(serverId);
+  if (!limit.allowed && limit.max !== -1) {
+    throw new AppError(402, 'Article limit reached', {
+      current: limit.current,
+      max: limit.max,
+      message: `You have reached your limit of ${limit.max} articles. Upgrade to create more.`,
+    });
   }
 
   const input = articleCreateSchema.parse(req.body);
@@ -129,6 +135,20 @@ articlesRouter.post('/:slug/vote', async (req, res, next) => {
     await articleService.voteArticle(serverId, slug, helpful);
 
     res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get article backlinks (incoming and outgoing)
+articlesRouter.get('/:slug/backlinks', async (req, res, next) => {
+  try {
+    const serverId = req.serverId!;
+    const { slug } = req.params;
+
+    const backlinks = await backlinkService.getArticleBacklinks(serverId, slug);
+
+    res.json(backlinks);
   } catch (error) {
     next(error);
   }

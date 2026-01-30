@@ -1,18 +1,12 @@
 import { Router, Request, Response, NextFunction } from 'express';
 
-import { requireAuth, requireServerId, AuthenticatedRequest } from '../middleware/auth';
+import { requireAuth, requireServerId } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
 import * as auditLogService from '../services/auditLogService';
 import * as memberService from '../services/memberService';
+import { asyncHandler } from '../utils/asyncHandler';
 
 export const auditLogsRouter = Router();
-
-// Wrapper to handle async middleware with proper typing
-const asyncHandler = (fn: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req as AuthenticatedRequest, res, next)).catch(next);
-  };
-};
 
 // Apply auth and serverId middleware to all routes
 auditLogsRouter.use(requireAuth as (req: Request, res: Response, next: NextFunction) => void);

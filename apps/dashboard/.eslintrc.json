@@ -9,6 +9,6 @@
     "@typescript-eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "import/order": "off",
     "import/no-named-as-default": "off",
-    "import/no-unresolved": ["error", { "ignore": ["^@dnd-kit/"] }]
+    "import/no-unresolved": ["error", { "ignore": ["^@dnd-kit/", "^@tiptap/", "^tippy.js"] }]
   }
 }

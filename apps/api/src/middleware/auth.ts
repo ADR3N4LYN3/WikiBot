@@ -1,3 +1,5 @@
+import { timingSafeEqual } from 'crypto';
+
 import { Request, Response, NextFunction } from 'express';
 import { jwtVerify, decodeJwt } from 'jose';
 
@@ -56,8 +58,17 @@ function isBotRequest(req: Request): boolean {
     return false;
   }
 
-  // Validate bot token matches expected secret
-  return botToken === expectedToken;
+  // SECURITY: Use timing-safe comparison to prevent timing attacks
+  const botTokenBuffer = Buffer.from(botToken);
+  const expectedBuffer = Buffer.from(expectedToken);
+
+  // If lengths differ, comparison would fail anyway, but we still need to
+  // avoid early return to prevent timing-based length discovery
+  if (botTokenBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+
+  return timingSafeEqual(botTokenBuffer, expectedBuffer);
 }
 
 // Verify and decode NextAuth JWT token

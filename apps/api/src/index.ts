@@ -21,6 +21,7 @@ import { settingsRouter } from './routes/settings';
 import { statsRouter } from './routes/stats';
 import { subscriptionsRouter } from './routes/subscriptions';
 import { webhooksRouter } from './routes/webhooks';
+import { initRedis } from './utils/redis';
 
 const app = express();
 const PORT = process.env.API_PORT || 4000;
@@ -81,8 +82,19 @@ app.use('/api/v1/contact', contactRouter);
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`🚀 API server running on http://localhost:${PORT}`);
+// Initialize services and start server
+async function start() {
+  // Initialize Redis (optional - continues without if not configured)
+  await initRedis();
+
+  app.listen(PORT, () => {
+    console.log(`🚀 API server running on http://localhost:${PORT}`);
+  });
+}
+
+start().catch((error) => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
 });
 
 export default app;

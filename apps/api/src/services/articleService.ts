@@ -4,6 +4,8 @@ import { ArticleCreateInput, ArticleUpdateInput } from '@wikibot/shared';
 import { AppError } from '../middleware/errorHandler';
 import { generateSlug } from '../utils/slug';
 
+import * as backlinkService from './backlinkService';
+
 interface GetArticlesOptions {
   serverId: string;
   categoryId?: string;
@@ -157,6 +159,9 @@ export async function createArticle(input: CreateArticleInput) {
   // TODO: Generate embeddings for AI search
   // await embeddingService.generateAndIndexArticle(article);
 
+  // Update backlinks based on article content
+  await backlinkService.updateBacklinks(serverId, article.id, content);
+
   return article;
 }
 
@@ -211,6 +216,11 @@ export async function updateArticle(
   // if (input.content) {
   //   await embeddingService.generateAndIndexArticle(updated);
   // }
+
+  // Update backlinks if content changed
+  if (input.content) {
+    await backlinkService.updateBacklinks(serverId, updated.id, input.content);
+  }
 
   return updated;
 }

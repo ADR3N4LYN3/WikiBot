@@ -1,17 +1,11 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 
-import { optionalAuth, AuthenticatedRequest } from '../middleware/auth';
+import { optionalAuth } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
+import { asyncHandler } from '../utils/asyncHandler';
 
 export const contactRouter = Router();
-
-// Wrapper to handle async middleware with proper typing
-const asyncHandler = (fn: (req: AuthenticatedRequest, res: Response, next: NextFunction) => Promise<void>) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req as AuthenticatedRequest, res, next)).catch(next);
-  };
-};
 
 // Contact form validation schema
 const contactSchema = z.object({
