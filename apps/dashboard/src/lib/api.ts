@@ -94,8 +94,14 @@ export const subscriptionsApi = {
     api.post('/api/v1/subscriptions/cancel', { immediate }),
 };
 
+// Settings API - uses internal proxy route for proper JWT auth
+const getServerIdHeader = () => {
+  const serverId = typeof window !== 'undefined' ? localStorage.getItem('selectedServerId') : null;
+  return serverId ? { 'X-Server-Id': serverId } : {};
+};
+
 export const settingsApi = {
-  get: () => api.get('/api/v1/settings'),
+  get: () => axios.get('/api/settings', { headers: getServerIdHeader() }),
   update: (data: {
     brandColor?: string;
     logoUrl?: string | null;
@@ -105,7 +111,7 @@ export const settingsApi = {
     searchLoggingEnabled?: boolean;
     moderationEnabled?: boolean;
     fastIndexingEnabled?: boolean;
-  }) => api.put('/api/v1/settings', data),
+  }) => axios.put('/api/settings', data, { headers: getServerIdHeader() }),
   getLogoUploadUrl: (filename: string, contentType: string) =>
     api.post('/api/v1/settings/logo/upload-url', { filename, contentType }),
   deleteLogo: () => api.delete('/api/v1/settings/logo'),
