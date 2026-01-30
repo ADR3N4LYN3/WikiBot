@@ -127,12 +127,11 @@ export function Features() {
         >
           {features.map((feature) => (
             <motion.div key={feature.title} variants={itemVariants}>
-              <GlassCard className="h-full p-4 sm:p-6 group">
-                <div className="flex flex-col items-center text-center h-full w-full">
+              <GlassCard className="h-full p-4 sm:p-6 group text-center">
                   {/* Icon */}
                   <div
                     className={cn(
-                      'w-10 h-10 sm:w-12 sm:h-12 rounded-xl mb-3 sm:mb-4',
+                      'w-10 h-10 sm:w-12 sm:h-12 rounded-xl mb-3 sm:mb-4 mx-auto',
                       'bg-gradient-to-br',
                       feature.gradient,
                       'flex items-center justify-center',
@@ -150,7 +149,6 @@ export function Features() {
                   <p className="text-xs sm:text-sm text-muted-foreground">
                     {feature.description}
                   </p>
-                </div>
               </GlassCard>
             </motion.div>
           ))}
