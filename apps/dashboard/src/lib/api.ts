@@ -1,17 +1,17 @@
 import axios from 'axios';
-import { getSession } from 'next-auth/react';
 
 import type { ExportData } from './types';
 
+// Use internal proxy for all API requests (handles JWT auth)
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000',
+  baseURL: '/api/proxy',
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Request interceptor to add auth and server headers
-api.interceptors.request.use(async (config) => {
+// Request interceptor to add server ID header
+api.interceptors.request.use((config) => {
   // Get server ID from localStorage
   const serverId = typeof window !== 'undefined'
     ? localStorage.getItem('selectedServerId')
@@ -19,14 +19,6 @@ api.interceptors.request.use(async (config) => {
 
   if (serverId) {
     config.headers['X-Server-Id'] = serverId;
-  }
-
-  // Get session token for authentication
-  if (typeof window !== 'undefined') {
-    const session = await getSession();
-    if (session?.accessToken) {
-      config.headers['Authorization'] = `Bearer ${session.accessToken}`;
-    }
   }
 
   return config;
@@ -42,66 +34,60 @@ api.interceptors.response.use(
   }
 );
 
-// API functions
+// API functions - all routes go through /api/proxy which handles JWT auth
 export const articlesApi = {
   getAll: (params?: { categoryId?: string; published?: boolean; page?: number; limit?: number }) =>
-    api.get('/api/v1/articles', { params }),
-  getBySlug: (slug: string) => api.get(`/api/v1/articles/${slug}`),
+    api.get('/articles', { params }),
+  getBySlug: (slug: string) => api.get(`/articles/${slug}`),
   create: (data: { title: string; content: string; categorySlug?: string }) =>
-    api.post('/api/v1/articles', data),
+    api.post('/articles', data),
   update: (slug: string, data: { title?: string; content?: string; published?: boolean }) =>
-    api.put(`/api/v1/articles/${slug}`, data),
-  delete: (slug: string) => api.delete(`/api/v1/articles/${slug}`),
+    api.put(`/articles/${slug}`, data),
+  delete: (slug: string) => api.delete(`/articles/${slug}`),
 };
 
 export const categoriesApi = {
-  getAll: () => api.get('/api/v1/categories'),
+  getAll: () => api.get('/categories'),
   create: (data: { name: string; slug: string; description?: string; emoji?: string }) =>
-    api.post('/api/v1/categories', data),
+    api.post('/categories', data),
   update: (slug: string, data: { name?: string; description?: string; emoji?: string }) =>
-    api.put(`/api/v1/categories/${slug}`, data),
-  delete: (slug: string) => api.delete(`/api/v1/categories/${slug}`),
+    api.put(`/categories/${slug}`, data),
+  delete: (slug: string) => api.delete(`/categories/${slug}`),
 };
 
 export const analyticsApi = {
-  getOverview: () => api.get('/api/v1/analytics/overview'),
+  getOverview: () => api.get('/analytics/overview'),
   getTopArticles: (limit?: number) =>
-    api.get('/api/v1/analytics/top-articles', { params: { limit } }),
+    api.get('/analytics/top-articles', { params: { limit } }),
   getTopSearches: (limit?: number) =>
-    api.get('/api/v1/analytics/top-searches', { params: { limit } }),
+    api.get('/analytics/top-searches', { params: { limit } }),
   getActivity: (days?: number) =>
-    api.get('/api/v1/analytics/activity', { params: { days } }),
+    api.get('/analytics/activity', { params: { days } }),
 };
 
 export const searchApi = {
   search: (query: string, type: 'fulltext' | 'semantic' = 'fulltext') =>
-    api.get('/api/v1/search', { params: { q: query, type } }),
+    api.get('/search', { params: { q: query, type } }),
 };
 
 export const subscriptionsApi = {
-  getStatus: () => api.get('/api/v1/subscriptions/status'),
-  getUsage: () => api.get('/api/v1/subscriptions/usage'),
-  getPlans: () => api.get('/api/v1/subscriptions/plans'),
+  getStatus: () => api.get('/subscriptions/status'),
+  getUsage: () => api.get('/subscriptions/usage'),
+  getPlans: () => api.get('/subscriptions/plans'),
   createCheckout: (data: {
     tier: 'premium' | 'pro';
     successUrl: string;
     cancelUrl: string;
     email?: string;
-  }) => api.post('/api/v1/subscriptions/checkout', data),
+  }) => api.post('/subscriptions/checkout', data),
   createPortal: (data: { returnUrl: string }) =>
-    api.post('/api/v1/subscriptions/portal', data),
+    api.post('/subscriptions/portal', data),
   cancel: (immediate?: boolean) =>
-    api.post('/api/v1/subscriptions/cancel', { immediate }),
-};
-
-// Settings API - uses internal proxy route for proper JWT auth
-const getServerIdHeader = () => {
-  const serverId = typeof window !== 'undefined' ? localStorage.getItem('selectedServerId') : null;
-  return serverId ? { 'X-Server-Id': serverId } : {};
+    api.post('/subscriptions/cancel', { immediate }),
 };
 
 export const settingsApi = {
-  get: () => axios.get('/api/settings', { headers: getServerIdHeader() }),
+  get: () => api.get('/settings'),
   update: (data: {
     brandColor?: string;
     logoUrl?: string | null;
@@ -111,36 +97,36 @@ export const settingsApi = {
     searchLoggingEnabled?: boolean;
     moderationEnabled?: boolean;
     fastIndexingEnabled?: boolean;
-  }) => axios.put('/api/settings', data, { headers: getServerIdHeader() }),
+  }) => api.put('/settings', data),
   getLogoUploadUrl: (filename: string, contentType: string) =>
-    api.post('/api/v1/settings/logo/upload-url', { filename, contentType }),
-  deleteLogo: () => api.delete('/api/v1/settings/logo'),
+    api.post('/settings/logo/upload-url', { filename, contentType }),
+  deleteLogo: () => api.delete('/settings/logo'),
 };
 
 export const exportApi = {
-  exportJson: () => api.get('/api/v1/export/json'),
-  exportMarkdown: () => api.get('/api/v1/export/markdown', { responseType: 'blob' }),
+  exportJson: () => api.get('/export/json'),
+  exportMarkdown: () => api.get('/export/markdown', { responseType: 'blob' }),
   importJson: (data: ExportData, options?: { overwriteExisting?: boolean; importCategories?: boolean }) =>
-    api.post('/api/v1/export/import', { data, ...options }),
-  validate: (data: ExportData) => api.post('/api/v1/export/validate', { data }),
+    api.post('/export/import', { data, ...options }),
+  validate: (data: ExportData) => api.post('/export/validate', { data }),
 };
 
 export const membersApi = {
-  getAll: () => api.get('/api/v1/members'),
-  getMe: () => api.get('/api/v1/members/me'),
-  getById: (userId: string) => api.get(`/api/v1/members/${userId}`),
+  getAll: () => api.get('/members'),
+  getMe: () => api.get('/members/me'),
+  getById: (userId: string) => api.get(`/members/${userId}`),
   add: (data: {
     userId: string;
     role?: 'admin' | 'editor' | 'viewer';
     username?: string;
     discriminator?: string;
     avatar?: string;
-  }) => api.post('/api/v1/members', data),
+  }) => api.post('/members', data),
   updateRole: (userId: string, role: 'admin' | 'editor' | 'viewer') =>
-    api.put(`/api/v1/members/${userId}/role`, { role }),
-  remove: (userId: string) => api.delete(`/api/v1/members/${userId}`),
+    api.put(`/members/${userId}/role`, { role }),
+  remove: (userId: string) => api.delete(`/members/${userId}`),
   transferOwnership: (newOwnerId: string) =>
-    api.post('/api/v1/members/transfer-ownership', { newOwnerId }),
+    api.post('/members/transfer-ownership', { newOwnerId }),
 };
 
 export const auditLogsApi = {
@@ -152,15 +138,15 @@ export const auditLogsApi = {
     actorId?: string;
     startDate?: string;
     endDate?: string;
-  }) => api.get('/api/v1/audit-logs', { params }),
-  getById: (logId: string) => api.get(`/api/v1/audit-logs/${logId}`),
+  }) => api.get('/audit-logs', { params }),
+  getById: (logId: string) => api.get(`/audit-logs/${logId}`),
 };
 
 export const permissionsApi = {
-  getAll: () => api.get('/api/v1/permissions'),
-  getMe: () => api.get('/api/v1/permissions/me'),
-  getByUserId: (userId: string) => api.get(`/api/v1/permissions/${userId}`),
+  getAll: () => api.get('/permissions'),
+  getMe: () => api.get('/permissions/me'),
+  getByUserId: (userId: string) => api.get(`/permissions/${userId}`),
   update: (userId: string, overrides: Record<string, boolean | null>) =>
-    api.put(`/api/v1/permissions/${userId}`, { overrides }),
-  reset: (userId: string) => api.delete(`/api/v1/permissions/${userId}`),
+    api.put(`/permissions/${userId}`, { overrides }),
+  reset: (userId: string) => api.delete(`/permissions/${userId}`),
 };
