@@ -111,8 +111,8 @@ export function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          Create and connect articles with [[wiki-links]]. AI-powered search,
-          per-article analytics, and a beautiful editor with slash commands.
+          Create, organize, and connect articles with a built-in knowledge graph.
+          AI-powered search, per-article analytics, and slash commands in the editor.
         </motion.p>
 
         {/* CTA Buttons */}
